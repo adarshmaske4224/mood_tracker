@@ -54,6 +54,9 @@ export default function TeacherDashboard() {
   const [solutionText, setSolutionText] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
   const [actionMessage, setActionMessage] = useState('');
+  const [guidanceNotice, setGuidanceNotice] = useState(null);
+  const [confirmResolving, setConfirmResolving] = useState(false);
+  const [dashboardToast, setDashboardToast] = useState(null);
   const [activeTab, setActiveTab] = useState('active'); // 'active' | 'history'
   const [contactNotes, setContactNotes] = useState('');
 
@@ -74,6 +77,8 @@ export default function TeacherDashboard() {
     setSelectedCase(caseItem);
     setDetailLoading(true);
     setActionMessage('');
+    setGuidanceNotice(null);
+    setConfirmResolving(false);
     setSolutionText(caseItem.teacherSolution || '');
     setContactNotes('');
     try {
@@ -89,38 +94,97 @@ export default function TeacherDashboard() {
   const handleCloseDetail = () => {
     setSelectedCase(null);
     setStudentDetail(null);
+    setGuidanceNotice(null);
+    setConfirmResolving(false);
   };
 
   const handleSubmitSolution = async (e) => {
     e.preventDefault();
-    if (!solutionText) return;
+    if (!solutionText || !solutionText.trim()) return;
     setActionLoading(true);
+    setGuidanceNotice(null);
     try {
-      const res = await api.submitTeacherSolution(selectedCase.id, solutionText);
-      setActionMessage(res.message);
+      const trimmedSolution = solutionText.trim();
+      const res = await api.submitTeacherSolution(selectedCase.id, trimmedSolution);
+      setGuidanceNotice({
+        type: 'success',
+        message: res.message || 'Guidance updated successfully! 7-day mood recovery tracking is active.'
+      });
+
+      // Update current selectedCase state immediately
+      const updatedCase = {
+        ...selectedCase,
+        teacherSolution: trimmedSolution,
+        status: selectedCase.status === 'ASSIGNED' ? 'IN_PROGRESS' : selectedCase.status
+      };
+      setSelectedCase(updatedCase);
+
+      // Update dashboard cases in-place
+      setData((prev) => {
+        if (!prev) return prev;
+        const updateCaseInList = (list) => (list || []).map((c) =>
+          c.id === selectedCase.id ? { ...c, teacherSolution: trimmedSolution, status: c.status === 'ASSIGNED' ? 'IN_PROGRESS' : c.status } : c
+        );
+        return {
+          ...prev,
+          activeCases: updateCaseInList(prev.activeCases),
+          allCases: updateCaseInList(prev.allCases),
+        };
+      });
+
+      // Also refresh student detail and full dashboard
+      api.getTeacherStudentDetail(selectedCase.id).then((updated) => {
+        if (updated) {
+          setStudentDetail(updated);
+          if (updated.studentCase) setSelectedCase(updated.studentCase);
+        }
+      }).catch(console.error);
+
       fetchDashboard();
-      const updated = await api.getTeacherStudentDetail(selectedCase.id);
-      setStudentDetail(updated);
-      setSelectedCase(updated.studentCase);
     } catch (err) {
-      setActionMessage(err.message || 'Failed to submit solution');
+      setGuidanceNotice({
+        type: 'error',
+        message: err.message || 'Failed to submit guidance'
+      });
     } finally {
       setActionLoading(false);
     }
   };
 
   const handleResolveCase = async () => {
-    if (!window.confirm('Mark this student\'s case as resolved? They will no longer appear in your active queue.')) return;
     setActionLoading(true);
+    setGuidanceNotice(null);
     try {
       const res = await api.resolveTeacherCase(selectedCase.id);
-      setActionMessage(res.message);
-      fetchDashboard();
+      const studentName = selectedCase.student?.fullName || 'Student';
+
+      // Update local state: remove from activeCases, update in allCases
+      setData((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          activeCases: (prev.activeCases || []).filter((c) => c.id !== selectedCase.id),
+          allCases: (prev.allCases || []).map((c) =>
+            c.id === selectedCase.id ? { ...c, status: 'RESOLVED' } : c
+          ),
+        };
+      });
+
+      setDashboardToast({
+        type: 'success',
+        message: `Case for ${studentName} marked as RESOLVED! It has moved to Complete Case History.`,
+      });
+
       handleCloseDetail();
+      fetchDashboard();
     } catch (err) {
-      setActionMessage(err.message || 'Failed to resolve case');
+      setGuidanceNotice({
+        type: 'error',
+        message: err.message || 'Failed to resolve case'
+      });
     } finally {
       setActionLoading(false);
+      setConfirmResolving(false);
     }
   };
 
@@ -192,6 +256,47 @@ export default function TeacherDashboard() {
       </div>
 
       <div className="page-wrap">
+        {/* Dashboard Toast / Alert */}
+        {dashboardToast && (
+          <div 
+            style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center', 
+              marginBottom: '20px', 
+              padding: '14px 20px', 
+              borderRadius: '12px',
+              background: '#ecfdf5',
+              border: '1px solid #6ee7b7',
+              color: '#065f46',
+              boxShadow: '0 2px 8px rgba(16, 185, 129, 0.15)'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <CheckCircle size={22} color="#059669" />
+              <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>{dashboardToast.message}</span>
+            </div>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              {activeTab !== 'history' && (
+                <button 
+                  className="btn btn-sm" 
+                  style={{ background: '#059669', color: 'white', border: 'none', padding: '6px 14px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer' }}
+                  onClick={() => { setActiveTab('history'); setDashboardToast(null); }}
+                >
+                  View Case History →
+                </button>
+              )}
+              <button 
+                onClick={() => setDashboardToast(null)} 
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#065f46', padding: '4px', display: 'flex', alignItems: 'center' }}
+                title="Dismiss"
+              >
+                <X size={18} />
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Tab navigation */}
         <div style={{ display: 'flex', gap: '4px', marginBottom: '24px', background: '#f1f5f9', padding: '4px', borderRadius: '12px', width: 'fit-content' }}>
           <button 
@@ -535,6 +640,26 @@ export default function TeacherDashboard() {
                     Submitting guidance will start a <strong>7-day mood recovery tracking period</strong> — you can monitor
                     if the student's mood improves over the coming week.
                   </p>
+
+                  {guidanceNotice && (
+                    <div 
+                      style={{ 
+                        padding: '12px 16px', 
+                        marginBottom: '14px', 
+                        borderRadius: '8px', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '10px',
+                        background: guidanceNotice.type === 'success' ? '#ecfdf5' : '#fef2f2',
+                        border: `1px solid ${guidanceNotice.type === 'success' ? '#a7f3d0' : '#fecaca'}`,
+                        color: guidanceNotice.type === 'success' ? '#065f46' : '#991b1b'
+                      }}
+                    >
+                      {guidanceNotice.type === 'success' ? <CheckCircle size={18} color="#059669" /> : <AlertTriangle size={18} color="#dc2626" />}
+                      <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{guidanceNotice.message}</span>
+                    </div>
+                  )}
+
                   <form onSubmit={handleSubmitSolution}>
                     <textarea
                       className="textarea-field"
@@ -544,16 +669,53 @@ export default function TeacherDashboard() {
                       onChange={(e) => setSolutionText(e.target.value)}
                       required
                     />
-                    <div style={{ display: 'flex', gap: '10px', marginTop: '12px', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', gap: '10px', marginTop: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
                       <button type="submit" className="btn btn-primary" disabled={actionLoading}>
                         <Send size={16} />
-                        {selectedCase.teacherSolution ? 'Update Guidance' : 'Submit Guidance & Start 7-Day Tracking'}
+                        {actionLoading ? 'Saving...' : (selectedCase.teacherSolution ? 'Update Guidance' : 'Submit Guidance & Start 7-Day Tracking')}
                       </button>
-                      {(selectedCase.status === 'IN_PROGRESS' || selectedCase.status === 'ASSIGNED') && (
-                        <button type="button" className="btn btn-secondary" style={{ borderColor: '#10b981', color: '#10b981' }} onClick={handleResolveCase} disabled={actionLoading}>
+
+                      {selectedCase.status !== 'RESOLVED' && !confirmResolving && (
+                        <button 
+                          type="button" 
+                          className="btn btn-secondary" 
+                          style={{ borderColor: '#10b981', color: '#059669', background: '#ecfdf5', fontWeight: 600 }} 
+                          onClick={() => setConfirmResolving(true)} 
+                          disabled={actionLoading}
+                        >
                           <CheckCircle size={16} />
                           Mark as Resolved
                         </button>
+                      )}
+
+                      {confirmResolving && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#fef3c7', padding: '6px 12px', borderRadius: '8px', border: '1px solid #fde68a' }}>
+                          <span style={{ fontSize: '0.85rem', color: '#92400e', fontWeight: 600 }}>Mark this case as resolved?</span>
+                          <button
+                            type="button"
+                            className="btn btn-primary btn-sm"
+                            style={{ background: '#10b981', borderColor: '#10b981', padding: '6px 14px', fontSize: '0.85rem', fontWeight: 700 }}
+                            onClick={handleResolveCase}
+                            disabled={actionLoading}
+                          >
+                            {actionLoading ? 'Resolving...' : 'Yes, Confirm Resolve'}
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-secondary btn-sm"
+                            style={{ padding: '6px 12px', fontSize: '0.85rem' }}
+                            onClick={() => setConfirmResolving(false)}
+                            disabled={actionLoading}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      )}
+
+                      {selectedCase.status === 'RESOLVED' && (
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: '#16a34a', fontWeight: 700, background: '#f0fdf4', padding: '6px 12px', borderRadius: '8px' }}>
+                          <CheckCircle size={16} /> Case Status: Resolved
+                        </span>
                       )}
                     </div>
                   </form>

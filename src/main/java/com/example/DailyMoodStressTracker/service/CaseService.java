@@ -92,9 +92,13 @@ public class CaseService {
         }
 
         studentCase.setTeacherSolution(solution);
-        studentCase.setStatus(CaseStatus.IN_PROGRESS);
-        studentCase.setTrackingStartDate(LocalDate.now());
-        studentCase.setTrackingEndDate(LocalDate.now().plusDays(7));
+        if (studentCase.getStatus() != CaseStatus.RESOLVED) {
+            studentCase.setStatus(CaseStatus.IN_PROGRESS);
+        }
+        if (studentCase.getTrackingStartDate() == null) {
+            studentCase.setTrackingStartDate(LocalDate.now());
+            studentCase.setTrackingEndDate(LocalDate.now().plusDays(7));
+        }
 
         return caseRepository.save(studentCase);
     }

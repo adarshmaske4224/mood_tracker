@@ -216,63 +216,18 @@ export default function StudentDashboard() {
           </div>
         </div>
 
-        <div className="action-card action-card-emerald">
+        <div className="action-card action-card-emerald" onClick={() => document.getElementById('mood-chart-card')?.scrollIntoView({ behavior: 'smooth' })}>
           <div className="action-card-info">
-            <h3>Faculty & Counseling Support</h3>
-            <p>{activeCase ? `Status: ${activeCase.status}` : 'Protected 4-tier campus wellness net'}</p>
+            <h3>Weekly Mood & Stress Trend</h3>
+            <p>{data?.weeklyEntries?.length ? `${data.weeklyEntries.length} check-ins recorded this week` : 'Track your wellness over time'}</p>
           </div>
           <div className="action-circle-btn">
-            <HeartHandshake size={18} />
+            <TrendingUp size={18} />
           </div>
         </div>
       </div>
 
       <div className="page-wrap">
-        {/* Active Support Alert Banner if flagged / assigned / in progress */}
-        {activeCase && (
-          <div className="card" style={{ borderLeft: '5px solid #0284c7', background: '#f8fafc' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                  <span className={`status-badge status-${activeCase.status}`}>
-                    {activeCase.status}
-                  </span>
-                  <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                    Triggered after {activeCase.stressStreakDays} consecutive high stress days
-                  </span>
-                </div>
-                <h3 style={{ fontSize: '1.2rem', color: '#0c4a6e', marginBottom: '6px' }}>
-                  {activeCase.status === 'FLAGGED' && '🚨 Problem Received — Forwarded to HOD & Principal'}
-                  {activeCase.status === 'ASSIGNED' && `Assigned to Faculty Advisor: ${activeCase.assignedTeacher?.fullName}`}
-                  {activeCase.status === 'IN_PROGRESS' && `Counseling In Progress with ${activeCase.assignedTeacher?.fullName}`}
-                  {activeCase.status === 'RESOLVED' && 'Support Case Completed & Resolved'}
-                </h3>
-                {activeCase.problemDescription && (
-                  <div style={{ fontSize: '0.875rem', color: '#334155', marginTop: '6px', background: '#e2e8f0', padding: '8px 12px', borderRadius: '8px' }}>
-                    <strong>Your Submitted Problem:</strong> "{activeCase.problemDescription}"
-                  </div>
-                )}
-                {activeCase.teacherSolution ? (
-                  <div style={{ background: '#ffffff', border: '1px solid #bfdbfe', borderRadius: '10px', padding: '14px 18px', marginTop: '12px' }}>
-                    <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#0369a1', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <CheckCircle2 size={16} /> Teacher's Personalized Solution & Guidance:
-                    </div>
-                    <p style={{ color: '#1e293b', fontSize: '0.95rem' }}>{activeCase.teacherSolution}</p>
-                    {activeCase.trackingEndDate && (
-                      <div style={{ fontSize: '0.8rem', color: 'var(--text-subtle)', marginTop: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Clock size={14} /> 7-Day Monitoring Active until {activeCase.trackingEndDate}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '6px' }}>
-                    Your HOD and Principal have received your case. Your HOD will delegate a faculty mentor to reach out and counsel you.
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Main Grid */}
         <div className="dashboard-grid">
@@ -373,7 +328,7 @@ export default function StudentDashboard() {
             </div>
 
             {/* Weekly Trend Chart */}
-            <div className="card">
+            <div className="card" id="mood-chart-card">
               <div className="card-header">
                 <div className="card-title">
                   <TrendingUp size={20} color="#0284c7" />
@@ -486,13 +441,13 @@ export default function StudentDashboard() {
 
                 <div className="stat-box" style={{ background: '#f8fafc' }}>
                   <div>
-                    <div className="stat-label">Faculty Care Tier</div>
+                    <div className="stat-label">Wellness Status</div>
                     <div style={{ fontWeight: 700, fontSize: '1.05rem', color: '#0369a1', marginTop: '4px' }}>
-                      Active Protection
+                      Active & Monitored
                     </div>
                   </div>
                   <div className="stat-icon" style={{ background: '#dcfce7', color: '#166534' }}>
-                    <HeartHandshake size={22} />
+                    <Sparkles size={22} />
                   </div>
                 </div>
               </div>
