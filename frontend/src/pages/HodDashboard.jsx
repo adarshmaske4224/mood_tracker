@@ -218,16 +218,17 @@ export default function HodDashboard() {
                     </div>
 
                     <div style={{ background: '#fef2f2', borderRadius: '8px', padding: '12px', marginBottom: '14px' }}>
-                      <div style={{ fontWeight: 700, fontSize: '0.8rem', color: '#991b1b', marginBottom: '4px' }}>Student Problem:</div>
-                      <p style={{ fontSize: '0.85rem', color: '#7f1d1d' }}>
-                        Triggered after <strong>{c.stressStreakDays} consecutive high-stress days</strong>. 
-                        This student's AI analysis consistently detected anxiety, burnout, or emotional distress signals.
-                        Please delegate to a faculty counselor immediately.
+                      <div style={{ fontWeight: 700, fontSize: '0.8rem', color: '#991b1b', marginBottom: '4px' }}>Student's Problem:</div>
+                      <p style={{ fontSize: '0.9rem', color: '#7f1d1d', fontWeight: 600, marginBottom: '6px', lineHeight: 1.5 }}>
+                        "{c.problemDescription || 'Consistently high stress detected across daily check-ins.'}"
                       </p>
+                      <div style={{ fontSize: '0.75rem', color: '#b91c1c' }}>
+                        🔥 Stress Streak: <strong>{c.stressStreakDays} day{c.stressStreakDays !== 1 ? 's' : ''}</strong> • Needs faculty counseling
+                      </div>
                     </div>
 
                     <div style={{ fontSize: '0.8rem', color: 'var(--text-subtle)', marginBottom: '14px' }}>
-                      📅 Flagged: {c.createdAt ? new Date(c.createdAt).toLocaleDateString() : 'Recently'}
+                      📅 Submitted: {c.createdAt ? new Date(c.createdAt).toLocaleDateString() : 'Recently'}
                     </div>
 
                     <button className="btn btn-primary" style={{ width: '100%' }} onClick={() => handleOpenAssignModal(c)}>
@@ -337,9 +338,11 @@ export default function HodDashboard() {
             {/* Student info */}
             <div style={{ background: '#fef2f2', borderRadius: '10px', padding: '14px', marginBottom: '16px', borderLeft: '4px solid #ef4444' }}>
               <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#991b1b', marginBottom: '4px' }}>Student Requiring Support:</div>
-              <div style={{ fontSize: '0.9rem', color: '#7f1d1d' }}>
-                <strong>{selectedCaseToAssign.student?.fullName}</strong> ({selectedCaseToAssign.student?.rollNumber}) — 
-                {selectedCaseToAssign.stressStreakDays} consecutive high-stress days detected by AI.
+              <div style={{ fontSize: '0.9rem', color: '#7f1d1d', marginBottom: '8px' }}>
+                <strong>{selectedCaseToAssign.student?.fullName}</strong> ({selectedCaseToAssign.student?.rollNumber}) — {selectedCaseToAssign.student?.department?.code}
+              </div>
+              <div style={{ fontSize: '0.875rem', color: '#991b1b', background: 'white', padding: '10px 12px', borderRadius: '8px', border: '1px solid #fecaca' }}>
+                <strong>Reported Problem:</strong> "{selectedCaseToAssign.problemDescription || 'Elevated stress reported.'}"
               </div>
             </div>
 

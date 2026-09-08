@@ -76,6 +76,22 @@ public class ApiStudentController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/submit-problem")
+    public ResponseEntity<?> submitProblem(
+            Authentication authentication,
+            @RequestBody Map<String, String> body) {
+
+        User student = getUser(authentication);
+        String problemText = body.getOrDefault("problem", "");
+        StudentCase sc = moodService.submitProblem(student, problemText);
+
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "Your problem has been submitted and forwarded to your Department HOD and Principal!",
+                "activeCase", sc
+        ));
+    }
+
     private User getUser(Authentication authentication) {
         return userRepository.findByUsername(authentication.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));

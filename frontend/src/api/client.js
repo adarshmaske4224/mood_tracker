@@ -59,6 +59,11 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ mood, notes }),
     }),
+  submitStudentProblem: (problem) =>
+    request('/student/submit-problem', {
+      method: 'POST',
+      body: JSON.stringify({ problem }),
+    }),
 
   // Teacher
   getTeacherDashboard: () => request('/teacher/dashboard'),

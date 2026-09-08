@@ -55,10 +55,98 @@ public class MoodService {
 
         entry = moodEntryRepository.save(entry);
 
-        // Check if student should be flagged
-        checkAndFlagStudent(student);
+        // Immediately route student's problem to HOD and Principal dashboards
+        handleProblemCase(student, entry, notes);
 
         return entry;
+    }
+
+    /**
+     * Submit an explicit problem description directly to HOD and Principal.
+     */
+    @Transactional
+    public StudentCase submitProblem(User student, String problemText) {
+        Optional<StudentCase> activeOpt = studentCaseRepository.findByStudentAndStatusIn(
+                student,
+                List.of(CaseStatus.FLAGGED, CaseStatus.ASSIGNED, CaseStatus.IN_PROGRESS)
+        );
+
+        if (activeOpt.isPresent()) {
+            StudentCase existing = activeOpt.get();
+            existing.setProblemDescription(problemText);
+            return studentCaseRepository.save(existing);
+        }
+
+        StudentCase newCase = StudentCase.builder()
+                .student(student)
+                .status(CaseStatus.FLAGGED)
+                .stressStreakDays(Math.max(1, calculateStressStreak(student)))
+                .problemDescription(problemText)
+                .build();
+        return studentCaseRepository.save(newCase);
+    }
+
+    private String getMoodName(int mood) {
+        return switch (mood) {
+            case 1 -> "Awful (1/5)";
+            case 2 -> "Low (2/5)";
+            case 3 -> "Okay (3/5)";
+            case 4 -> "Good (4/5)";
+            case 5 -> "Great (5/5)";
+            default -> "Mood Level " + mood;
+        };
+    }
+
+    private int calculateStressStreak(User student) {
+        LocalDate today = LocalDate.now();
+        LocalDate start = today.minusDays(6);
+        List<MoodEntry> recent = moodEntryRepository.findByStudentAndDateBetweenOrderByDateAsc(student, start, today);
+        if (recent.isEmpty()) return 1;
+        int streak = 0;
+        for (int i = recent.size() - 1; i >= 0; i--) {
+            if (recent.get(i).getStressLevel() >= 4 || recent.get(i).getMood() <= 3) {
+                streak++;
+            } else {
+                break;
+            }
+        }
+        return Math.max(1, streak);
+    }
+
+    /**
+     * Immediately create or update StudentCase so it appears on HOD and Principal dashboards.
+     */
+    @Transactional
+    public void handleProblemCase(User student, MoodEntry entry, String notes) {
+        Optional<StudentCase> existingActive = studentCaseRepository.findByStudentAndStatusIn(
+                student,
+                List.of(CaseStatus.FLAGGED, CaseStatus.ASSIGNED, CaseStatus.IN_PROGRESS)
+        );
+
+        String problemText = (notes != null && !notes.trim().isEmpty())
+                ? notes.trim()
+                : "Student reported " + getMoodName(entry.getMood()) + " with AI Stress Level " + entry.getStressLevel() + "/10.";
+
+        if (existingActive.isPresent()) {
+            StudentCase activeCase = existingActive.get();
+            if (notes != null && !notes.trim().isEmpty()) {
+                activeCase.setProblemDescription(notes.trim());
+            }
+            if (activeCase.getStatus() == CaseStatus.FLAGGED) {
+                activeCase.setStressStreakDays(calculateStressStreak(student));
+            }
+            studentCaseRepository.save(activeCase);
+            return;
+        }
+
+        // Create new FLAGGED case for HOD and Principal review
+        StudentCase newCase = StudentCase.builder()
+                .student(student)
+                .status(CaseStatus.FLAGGED)
+                .stressStreakDays(calculateStressStreak(student))
+                .problemDescription(problemText)
+                .build();
+        studentCaseRepository.save(newCase);
     }
 
     /**
@@ -78,47 +166,12 @@ public class MoodService {
     }
 
     /**
-     * Check consecutive high-stress days and auto-flag student if threshold met.
+     * Check consecutive high-stress days and auto-flag student.
      */
     @Transactional
     public void checkAndFlagStudent(User student) {
-        // Don't flag if there's already an active case
-        boolean hasActiveCase = studentCaseRepository.existsByStudentAndStatusIn(
-                student,
-                List.of(CaseStatus.FLAGGED, CaseStatus.ASSIGNED, CaseStatus.IN_PROGRESS)
-        );
-
-        if (hasActiveCase) {
-            return;
-        }
-
-        // Get recent entries
-        LocalDate today = LocalDate.now();
-        LocalDate start = today.minusDays(CONSECUTIVE_DAYS_THRESHOLD - 1);
-        List<MoodEntry> recentEntries = moodEntryRepository
-                .findByStudentAndDateBetweenOrderByDateAsc(student, start, today);
-
-        // Check for consecutive high-stress days
-        if (recentEntries.size() >= CONSECUTIVE_DAYS_THRESHOLD) {
-            int consecutiveHighStress = 0;
-            for (int i = recentEntries.size() - 1; i >= 0; i--) {
-                if (recentEntries.get(i).getStressLevel() >= STRESS_THRESHOLD) {
-                    consecutiveHighStress++;
-                } else {
-                    break;
-                }
-            }
-
-            if (consecutiveHighStress >= CONSECUTIVE_DAYS_THRESHOLD) {
-                // Create a flagged case
-                StudentCase newCase = StudentCase.builder()
-                        .student(student)
-                        .status(CaseStatus.FLAGGED)
-                        .stressStreakDays(consecutiveHighStress)
-                        .build();
-                studentCaseRepository.save(newCase);
-            }
-        }
+        Optional<MoodEntry> today = getTodayEntry(student);
+        today.ifPresent(moodEntry -> handleProblemCase(student, moodEntry, moodEntry.getNotes()));
     }
 
     /**

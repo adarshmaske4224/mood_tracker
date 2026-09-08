@@ -242,11 +242,16 @@ export default function StudentDashboard() {
                   </span>
                 </div>
                 <h3 style={{ fontSize: '1.2rem', color: '#0c4a6e', marginBottom: '6px' }}>
-                  {activeCase.status === 'FLAGGED' && 'Case Forwarded to Head of Department (HOD)'}
-                  {activeCase.status === 'ASSIGNED' && `Assigned to Faculty Advisor: ${activeCase.assignedTeacher?.fullName}`}
-                  {activeCase.status === 'IN_PROGRESS' && `Counseling In Progress with ${activeCase.assignedTeacher?.fullName}`}
+                  {activeCase.status === 'FLAGGED' && '🚨 Problem Received — Forwarded to HOD & Principal'}
+                  {activeCase.status === 'ASSIGNED' && `Assigned to Faculty Advisor: Prof. ${activeCase.assignedTeacher?.fullName}`}
+                  {activeCase.status === 'IN_PROGRESS' && `Counseling In Progress with Prof. ${activeCase.assignedTeacher?.fullName}`}
                   {activeCase.status === 'RESOLVED' && 'Support Case Completed & Resolved'}
                 </h3>
+                {activeCase.problemDescription && (
+                  <div style={{ fontSize: '0.875rem', color: '#334155', marginTop: '6px', background: '#e2e8f0', padding: '8px 12px', borderRadius: '8px' }}>
+                    <strong>Your Submitted Problem:</strong> "{activeCase.problemDescription}"
+                  </div>
+                )}
                 {activeCase.teacherSolution ? (
                   <div style={{ background: '#ffffff', border: '1px solid #bfdbfe', borderRadius: '10px', padding: '14px 18px', marginTop: '12px' }}>
                     <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#0369a1', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -260,8 +265,8 @@ export default function StudentDashboard() {
                     )}
                   </div>
                 ) : (
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                    Your HOD and designated faculty mentor have been notified to provide assistance and adjust workload expectations.
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '6px' }}>
+                    Your HOD and Principal have received your case. Your HOD will delegate a faculty mentor to reach out and counsel you.
                   </p>
                 )}
               </div>
@@ -278,7 +283,7 @@ export default function StudentDashboard() {
               <div className="card-header">
                 <div className="card-title">
                   <Sparkles size={20} color="#0284c7" />
-                  Daily Mood & Stress Check-in
+                  Daily Mood & Problem Submission
                 </div>
                 {todayEntry && (
                   <span className="status-badge status-RESOLVED">
@@ -314,16 +319,16 @@ export default function StudentDashboard() {
 
                 <div style={{ marginBottom: '16px' }}>
                   <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '6px' }}>
-                    Notes or thoughts (What's on your mind?):
+                    State your problem, stress, or thoughts (Sent to HOD & Principal):
                   </label>
                   <textarea
                     className="textarea-field"
-                    placeholder="e.g. Overwhelmed with semester assignment deadlines and lab exams..."
+                    placeholder="Describe any issues, stress, academic pressure, personal difficulties, or challenges you are facing..."
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                   />
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', marginTop: '4px' }}>
-                    💡 AI analyzes mood value and keywords to calculate real-time stress index (1-10).
+                    💡 Submitting any issue or problem immediately alerts your Department HOD and Principal so faculty assistance can be delegated to you.
                   </div>
                 </div>
 
@@ -333,7 +338,7 @@ export default function StudentDashboard() {
                   disabled={submitting}
                 >
                   <Sparkles size={18} />
-                  {submitting ? 'Analyzing & Saving...' : todayEntry ? 'Update Today\'s Entry' : 'Submit & Analyze Stress'}
+                  {submitting ? 'Submitting & Routing to HOD...' : todayEntry ? 'Update Problem / Mood Log' : 'Submit Problem & Check-in'}
                 </button>
               </form>
 

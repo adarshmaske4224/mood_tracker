@@ -357,12 +357,21 @@ export default function TeacherDashboard() {
                 {/* ===== SECTION 1: Student's Problem Summary ===== */}
                 <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '12px', padding: '18px', marginBottom: '20px' }}>
                   <h4 style={{ color: '#991b1b', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-                    <AlertTriangle size={18} /> Student's Issue Summary
+                    <AlertTriangle size={18} /> Student's Problem & Issue Summary
                   </h4>
-                  <p style={{ fontSize: '0.9rem', color: '#7f1d1d', lineHeight: 1.7 }}>
-                    This student has shown <strong>consistently high stress levels</strong> for {selectedCase.stressStreakDays} consecutive days.
-                    The AI analysis detected emotional distress patterns including anxiety, exhaustion, and academic pressure from their daily mood logs.
-                    Below are the detailed daily entries — please review them carefully before providing your guidance.
+                  {selectedCase.problemDescription && (
+                    <div style={{ background: 'white', border: '1px solid #fca5a5', borderRadius: '8px', padding: '12px 14px', marginBottom: '12px' }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#991b1b', textTransform: 'uppercase', marginBottom: '4px' }}>
+                        Student's Reported Problem:
+                      </div>
+                      <div style={{ fontSize: '1rem', fontWeight: 600, color: '#7f1d1d' }}>
+                        "{selectedCase.problemDescription}"
+                      </div>
+                    </div>
+                  )}
+                  <p style={{ fontSize: '0.9rem', color: '#7f1d1d', lineHeight: 1.6 }}>
+                    This student has shown high stress for <strong>{selectedCase.stressStreakDays} consecutive day{selectedCase.stressStreakDays !== 1 ? 's' : ''}</strong>.
+                    Below are their complete mood logs and contact details. Please listen to their situation, contact them, and submit your guidance.
                   </p>
                 </div>
 

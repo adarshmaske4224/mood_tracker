@@ -38,6 +38,9 @@ public class StudentCase {
     @Column(columnDefinition = "TEXT")
     private String teacherSolution;
 
+    @Column(columnDefinition = "TEXT")
+    private String problemDescription;
+
     private LocalDate trackingStartDate;
 
     private LocalDate trackingEndDate;

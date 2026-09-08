@@ -319,7 +319,8 @@ export default function PrincipalDashboard() {
                       <th>Dept</th>
                       <th>Student</th>
                       <th>Roll Number</th>
-                      <th>High Stress Days</th>
+                      <th>Student Problem</th>
+                      <th>Stress Days</th>
                       <th>Assigned HOD</th>
                       <th>Assigned Faculty</th>
                       <th>Status</th>
@@ -333,11 +334,18 @@ export default function PrincipalDashboard() {
                         <td><span style={{ fontWeight: 700, color: '#0369a1', background: '#e0f2fe', padding: '3px 8px', borderRadius: '6px', fontSize: '0.75rem' }}>{c.student?.department?.code}</span></td>
                         <td style={{ fontWeight: 600 }}>{c.student?.fullName}</td>
                         <td>{c.student?.rollNumber}</td>
+                        <td style={{ fontSize: '0.85rem', color: '#0f172a', maxWidth: '220px' }}>
+                          {c.problemDescription ? (
+                            <span style={{ fontWeight: 600, color: '#991b1b' }}>"{c.problemDescription.substring(0, 75)}{c.problemDescription.length > 75 ? '…' : ''}"</span>
+                          ) : (
+                            <span style={{ color: 'var(--text-subtle)', fontStyle: 'italic' }}>High stress streak</span>
+                          )}
+                        </td>
                         <td><span style={{ background: '#ffe4e6', color: '#e11d48', fontWeight: 700, padding: '3px 8px', borderRadius: '6px', fontSize: '0.8rem' }}>🔥 {c.stressStreakDays}d</span></td>
                         <td>{c.assignedBy ? <span style={{ fontWeight: 600 }}>Dr. {c.assignedBy.fullName}</span> : <span style={{ color: '#f59e0b', fontSize: '0.85rem' }}>Pending HOD</span>}</td>
                         <td>{c.assignedTeacher ? <span style={{ fontWeight: 600, color: '#0369a1' }}>Prof. {c.assignedTeacher.fullName}</span> : <span style={{ color: '#ef4444', fontSize: '0.85rem', fontWeight: 600 }}>Unassigned</span>}</td>
                         <td><span className={`status-badge status-${c.status}`}>{c.status.replace('_', ' ')}</span></td>
-                        <td style={{ fontSize: '0.85rem', color: 'var(--text-muted)', maxWidth: '220px' }}>{c.teacherSolution ? c.teacherSolution.substring(0, 80) + (c.teacherSolution.length > 80 ? '…' : '') : <span style={{ fontStyle: 'italic' }}>Pending</span>}</td>
+                        <td style={{ fontSize: '0.85rem', color: 'var(--text-muted)', maxWidth: '200px' }}>{c.teacherSolution ? c.teacherSolution.substring(0, 80) + (c.teacherSolution.length > 80 ? '…' : '') : <span style={{ fontStyle: 'italic' }}>Pending</span>}</td>
                         <td style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{c.trackingStartDate ? `${c.trackingStartDate} → ${c.trackingEndDate}` : '—'}</td>
                       </tr>
                     ))}
