@@ -17,6 +17,7 @@ public class UserDto {
     private String username;
     private String fullName;
     private String rollNumber;
+    private String phoneNumber;
     private Role role;
     private Department department;
 
@@ -27,6 +28,7 @@ public class UserDto {
                 .username(user.getUsername())
                 .fullName(user.getFullName())
                 .rollNumber(user.getRollNumber())
+                .phoneNumber(user.getPhoneNumber())
                 .role(user.getRole())
                 .department(user.getDepartment())
                 .build();

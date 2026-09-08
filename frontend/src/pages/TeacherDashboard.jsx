@@ -239,6 +239,9 @@ export default function TeacherDashboard() {
                         <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                           <span>🎫 {c.student?.rollNumber}</span>
                           <span>🏛️ {c.student?.department?.code}</span>
+                          {c.student?.phoneNumber && (
+                            <span style={{ color: '#0284c7', fontWeight: 600 }}>📞 {c.student?.phoneNumber}</span>
+                          )}
                         </div>
                       </div>
                       <span className={`status-badge status-${c.status}`}>{c.status.replace('_', ' ')}</span>
@@ -332,8 +335,9 @@ export default function TeacherDashboard() {
                   <h2 style={{ fontSize: '1.5rem', color: '#0c4a6e' }}>{selectedCase.student?.fullName}</h2>
                   <span className={`status-badge status-${selectedCase.status}`}>{selectedCase.status.replace('_', ' ')}</span>
                 </div>
-                <div style={{ display: 'flex', gap: '16px', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+                <div style={{ display: 'flex', gap: '16px', fontSize: '0.875rem', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
                   <span>🎫 Roll No: <strong>{selectedCase.student?.rollNumber}</strong></span>
+                  <span>📞 Phone: <strong style={{ color: '#0284c7' }}>{selectedCase.student?.phoneNumber || 'Not provided'}</strong></span>
                   <span>🏛️ Department: <strong>{selectedCase.student?.department?.code}</strong></span>
                   <span>🔥 Consecutive high-stress days: <strong style={{ color: '#dc2626' }}>{selectedCase.stressStreakDays}</strong></span>
                 </div>
@@ -471,15 +475,50 @@ export default function TeacherDashboard() {
                     or send them a supportive message through your college portal.
                   </p>
                   <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                    <div style={{ flex: 1, background: 'white', borderRadius: '10px', padding: '12px 16px', border: '1px solid #dbeafe' }}>
+                    <div style={{ flex: 1, minWidth: '160px', background: 'white', borderRadius: '10px', padding: '12px 16px', border: '1px solid #dbeafe' }}>
                       <div style={{ fontWeight: 700, fontSize: '0.8rem', color: '#1e40af', marginBottom: '2px' }}>Student Username</div>
                       <div style={{ fontWeight: 600, color: '#1e293b' }}>{selectedCase.student?.username}</div>
                     </div>
-                    <div style={{ flex: 1, background: 'white', borderRadius: '10px', padding: '12px 16px', border: '1px solid #dbeafe' }}>
+                    <div style={{ flex: 1, minWidth: '160px', background: 'white', borderRadius: '10px', padding: '12px 16px', border: '1px solid #dbeafe' }}>
                       <div style={{ fontWeight: 700, fontSize: '0.8rem', color: '#1e40af', marginBottom: '2px' }}>Roll Number</div>
                       <div style={{ fontWeight: 600, color: '#1e293b' }}>{selectedCase.student?.rollNumber}</div>
                     </div>
-                    <div style={{ flex: 1, background: 'white', borderRadius: '10px', padding: '12px 16px', border: '1px solid #dbeafe' }}>
+                    <div style={{ flex: 1.5, minWidth: '220px', background: 'white', borderRadius: '10px', padding: '12px 16px', border: '2px solid #93c5fd' }}>
+                      <div style={{ fontWeight: 700, fontSize: '0.8rem', color: '#1e40af', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Phone size={14} /> Student Phone / Contact
+                      </div>
+                      {selectedCase.student?.phoneNumber ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                          <a
+                            href={`tel:${selectedCase.student.phoneNumber}`}
+                            style={{ fontWeight: 700, color: '#0284c7', fontSize: '1.05rem', textDecoration: 'none' }}
+                          >
+                            📞 {selectedCase.student.phoneNumber}
+                          </a>
+                          <a
+                            href={`https://wa.me/${selectedCase.student.phoneNumber.replace(/[^0-9]/g, '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              fontSize: '0.75rem',
+                              fontWeight: 700,
+                              background: '#22c55e',
+                              color: 'white',
+                              padding: '3px 8px',
+                              borderRadius: '6px',
+                              textDecoration: 'none',
+                            }}
+                          >
+                            WhatsApp Chat
+                          </a>
+                        </div>
+                      ) : (
+                        <span style={{ color: 'var(--text-subtle)', fontStyle: 'italic', fontSize: '0.85rem' }}>
+                          No phone number recorded
+                        </span>
+                      )}
+                    </div>
+                    <div style={{ flex: 1, minWidth: '160px', background: 'white', borderRadius: '10px', padding: '12px 16px', border: '1px solid #dbeafe' }}>
                       <div style={{ fontWeight: 700, fontSize: '0.8rem', color: '#1e40af', marginBottom: '2px' }}>Department</div>
                       <div style={{ fontWeight: 600, color: '#1e293b' }}>{selectedCase.student?.department?.name}</div>
                     </div>

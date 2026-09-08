@@ -41,6 +41,7 @@ public class AuthController {
     public String registerStudent(
             @RequestParam String fullName,
             @RequestParam String rollNumber,
+            @RequestParam(required = false) String phoneNumber,
             @RequestParam String username,
             @RequestParam String password,
             @RequestParam Long departmentId,
@@ -64,6 +65,7 @@ public class AuthController {
         User student = User.builder()
                 .fullName(fullName)
                 .rollNumber(rollNumber)
+                .phoneNumber(phoneNumber)
                 .username(username)
                 .password(passwordEncoder.encode(password))
                 .role(Role.STUDENT)

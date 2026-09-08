@@ -6,6 +6,7 @@ import lombok.Data;
 public class RegisterRequest {
     private String fullName;
     private String rollNumber;
+    private String phoneNumber;
     private String username;
     private String password;
     private Long departmentId;

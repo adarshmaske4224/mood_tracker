@@ -96,6 +96,7 @@ public class ApiAuthController {
         User student = User.builder()
                 .fullName(request.getFullName())
                 .rollNumber(request.getRollNumber())
+                .phoneNumber(request.getPhoneNumber())
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.STUDENT)

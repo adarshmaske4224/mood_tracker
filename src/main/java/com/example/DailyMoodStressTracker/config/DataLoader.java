@@ -71,10 +71,10 @@ public class DataLoader implements CommandLineRunner {
         userRepository.save(User.builder().username("teacher_aids2").password(encodedPassword).fullName("Prof. Swati Pillai").role(Role.TEACHER).department(aids).build());
 
         // Create Sample Students
-        User student1 = userRepository.save(User.builder().username("rahul_cse").password(encodedPassword).fullName("Rahul Mehra").rollNumber("CSE2024001").role(Role.STUDENT).department(cse).build());
-        User student2 = userRepository.save(User.builder().username("priya_cse").password(encodedPassword).fullName("Priya Kapoor").rollNumber("CSE2024002").role(Role.STUDENT).department(cse).build());
-        User student3 = userRepository.save(User.builder().username("amit_mech").password(encodedPassword).fullName("Amit Dubey").rollNumber("MECH2024001").role(Role.STUDENT).department(mech).build());
-        User student4 = userRepository.save(User.builder().username("sneha_aids").password(encodedPassword).fullName("Sneha Rajan").rollNumber("AIDS2024001").role(Role.STUDENT).department(aids).build());
+        User student1 = userRepository.save(User.builder().username("rahul_cse").password(encodedPassword).fullName("Rahul Mehra").rollNumber("CSE2024001").phoneNumber("+91 98765 43210").role(Role.STUDENT).department(cse).build());
+        User student2 = userRepository.save(User.builder().username("priya_cse").password(encodedPassword).fullName("Priya Kapoor").rollNumber("CSE2024002").phoneNumber("+91 98123 45678").role(Role.STUDENT).department(cse).build());
+        User student3 = userRepository.save(User.builder().username("amit_mech").password(encodedPassword).fullName("Amit Dubey").rollNumber("MECH2024001").phoneNumber("+91 97654 32109").role(Role.STUDENT).department(mech).build());
+        User student4 = userRepository.save(User.builder().username("sneha_aids").password(encodedPassword).fullName("Sneha Rajan").rollNumber("AIDS2024001").phoneNumber("+91 96543 21098").role(Role.STUDENT).department(aids).build());
 
         // Seed mood data for the past 7 days
         seedMoodData(student1, true);   // student1 will have high stress (triggers flagging)

@@ -9,6 +9,7 @@ export default function Register({ onNavigate }) {
   const [formData, setFormData] = useState({
     fullName: '',
     rollNumber: '',
+    phoneNumber: '',
     username: '',
     password: '',
     departmentId: '',
@@ -42,6 +43,7 @@ export default function Register({ onNavigate }) {
       await register({
         fullName: formData.fullName,
         rollNumber: formData.rollNumber,
+        phoneNumber: formData.phoneNumber,
         username: formData.username,
         password: formData.password,
         departmentId: Number(formData.departmentId),
@@ -132,6 +134,21 @@ export default function Register({ onNavigate }) {
                 ))}
               </select>
             </div>
+          </div>
+
+          <div style={{ marginBottom: '14px' }}>
+            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px' }}>
+              📞 Phone / Mobile Number (for Faculty Contact)
+            </label>
+            <input
+              type="tel"
+              name="phoneNumber"
+              className="input-field"
+              placeholder="e.g. +91 9876543210"
+              value={formData.phoneNumber}
+              onChange={handleChange}
+              required
+            />
           </div>
 
           <div style={{ marginBottom: '14px' }}>

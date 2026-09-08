@@ -210,8 +210,10 @@ export default function HodDashboard() {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
                       <div>
                         <h3 style={{ fontSize: '1.1rem', marginBottom: '4px' }}>{c.student?.fullName}</h3>
-                        <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                          🎫 {c.student?.rollNumber} • 🏛️ {c.student?.department?.code}
+                        <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                          <span>🎫 {c.student?.rollNumber}</span>
+                          {c.student?.phoneNumber && <span>📞 {c.student?.phoneNumber}</span>}
+                          <span>🏛️ {c.student?.department?.code}</span>
                         </div>
                       </div>
                       <span className="status-badge status-FLAGGED">⚠️ FLAGGED</span>
@@ -340,6 +342,9 @@ export default function HodDashboard() {
               <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#991b1b', marginBottom: '4px' }}>Student Requiring Support:</div>
               <div style={{ fontSize: '0.9rem', color: '#7f1d1d', marginBottom: '8px' }}>
                 <strong>{selectedCaseToAssign.student?.fullName}</strong> ({selectedCaseToAssign.student?.rollNumber}) — {selectedCaseToAssign.student?.department?.code}
+                {selectedCaseToAssign.student?.phoneNumber && (
+                  <span style={{ marginLeft: '10px', color: '#0284c7', fontWeight: 600 }}>📞 {selectedCaseToAssign.student?.phoneNumber}</span>
+                )}
               </div>
               <div style={{ fontSize: '0.875rem', color: '#991b1b', background: 'white', padding: '10px 12px', borderRadius: '8px', border: '1px solid #fecaca' }}>
                 <strong>Reported Problem:</strong> "{selectedCaseToAssign.problemDescription || 'Elevated stress reported.'}"
