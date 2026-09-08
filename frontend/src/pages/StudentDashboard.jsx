@@ -243,8 +243,8 @@ export default function StudentDashboard() {
                 </div>
                 <h3 style={{ fontSize: '1.2rem', color: '#0c4a6e', marginBottom: '6px' }}>
                   {activeCase.status === 'FLAGGED' && '🚨 Problem Received — Forwarded to HOD & Principal'}
-                  {activeCase.status === 'ASSIGNED' && `Assigned to Faculty Advisor: Prof. ${activeCase.assignedTeacher?.fullName}`}
-                  {activeCase.status === 'IN_PROGRESS' && `Counseling In Progress with Prof. ${activeCase.assignedTeacher?.fullName}`}
+                  {activeCase.status === 'ASSIGNED' && `Assigned to Faculty Advisor: ${activeCase.assignedTeacher?.fullName}`}
+                  {activeCase.status === 'IN_PROGRESS' && `Counseling In Progress with ${activeCase.assignedTeacher?.fullName}`}
                   {activeCase.status === 'RESOLVED' && 'Support Case Completed & Resolved'}
                 </h3>
                 {activeCase.problemDescription && (

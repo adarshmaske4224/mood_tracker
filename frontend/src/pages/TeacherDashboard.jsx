@@ -152,7 +152,7 @@ export default function TeacherDashboard() {
           <div className="hero-content">
             <h1>Faculty Counselor Dashboard</h1>
             <p>
-              Welcome, <strong>Prof. {user?.fullName}</strong> — {user?.department?.name} Department.
+              Welcome, <strong>{user?.fullName}</strong> — {user?.department?.name} Department.
               You are the frontline mental health support for students assigned to you by your HOD.
               Review their issues, reach out, guide them, and track their mood recovery for 7 days.
             </p>

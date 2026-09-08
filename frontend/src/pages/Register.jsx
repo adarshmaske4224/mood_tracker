@@ -93,7 +93,7 @@ export default function Register({ onNavigate }) {
               type="text"
               name="fullName"
               className="input-field"
-              placeholder="e.g. Adarsh Sharma"
+              placeholder="e.g. Adarsh Maske"
               value={formData.fullName}
               onChange={handleChange}
               required
@@ -109,7 +109,7 @@ export default function Register({ onNavigate }) {
                 type="text"
                 name="rollNumber"
                 className="input-field"
-                placeholder="e.g. 21CS099"
+                placeholder="e.g. 4RB-34"
                 value={formData.rollNumber}
                 onChange={handleChange}
                 required

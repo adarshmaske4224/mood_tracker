@@ -47,20 +47,23 @@ public class DataLoader implements CommandLineRunner {
         userRepository.save(User.builder()
                 .username("principal")
                 .password(encodedPassword)
-                .fullName("Dr. Rajesh Kumar")
+                .fullName("Dr. Avinash Wankhade")
                 .role(Role.PRINCIPAL)
                 .build());
 
         // Create HODs
-        userRepository.save(User.builder().username("hod_cse").password(encodedPassword).fullName("Dr. Priya Sharma").role(Role.HOD).department(cse).build());
-        userRepository.save(User.builder().username("hod_mech").password(encodedPassword).fullName("Dr. Anil Verma").role(Role.HOD).department(mech).build());
-        userRepository.save(User.builder().username("hod_electrical").password(encodedPassword).fullName("Dr. Sunita Reddy").role(Role.HOD).department(electrical).build());
-        userRepository.save(User.builder().username("hod_civil").password(encodedPassword).fullName("Dr. Mohan Patel").role(Role.HOD).department(civil).build());
-        userRepository.save(User.builder().username("hod_aids").password(encodedPassword).fullName("Dr. Kavita Nair").role(Role.HOD).department(aids).build());
+        userRepository.save(User.builder().username("hod_cse").password(encodedPassword).fullName("Dr. S S Asole").role(Role.HOD).department(cse).build());
+        userRepository.save(User.builder().username("hod_mech").password(encodedPassword).fullName("Ingle Sir").role(Role.HOD).department(mech).build());
+        userRepository.save(User.builder().username("hod_electrical").password(encodedPassword).fullName("Dudhat Sir").role(Role.HOD).department(electrical).build());
+        userRepository.save(User.builder().username("hod_civil").password(encodedPassword).fullName("Zishan Sir").role(Role.HOD).department(civil).build());
+        userRepository.save(User.builder().username("hod_aids").password(encodedPassword).fullName("Gayakwad Sir").role(Role.HOD).department(aids).build());
 
-        // Create Teachers (2 per department)
-        userRepository.save(User.builder().username("teacher_cse1").password(encodedPassword).fullName("Prof. Amit Singh").role(Role.TEACHER).department(cse).build());
-        userRepository.save(User.builder().username("teacher_cse2").password(encodedPassword).fullName("Prof. Neha Gupta").role(Role.TEACHER).department(cse).build());
+        // Create Teachers
+        userRepository.save(User.builder().username("teacher_cse1").password(encodedPassword).fullName("Gawli Sir").role(Role.TEACHER).department(cse).build());
+        userRepository.save(User.builder().username("teacher_cse2").password(encodedPassword).fullName("Amdani Sir").role(Role.TEACHER).department(cse).build());
+        userRepository.save(User.builder().username("teacher_cse3").password(encodedPassword).fullName("Sachin Sir").role(Role.TEACHER).department(cse).build());
+        userRepository.save(User.builder().username("teacher_cse4").password(encodedPassword).fullName("Dr. P.B. Niranjane Ma'am").role(Role.TEACHER).department(cse).build());
+        userRepository.save(User.builder().username("teacher_cse5").password(encodedPassword).fullName("Khandare Sir").role(Role.TEACHER).department(cse).build());
         userRepository.save(User.builder().username("teacher_mech1").password(encodedPassword).fullName("Prof. Vikram Joshi").role(Role.TEACHER).department(mech).build());
         userRepository.save(User.builder().username("teacher_mech2").password(encodedPassword).fullName("Prof. Ritu Mehta").role(Role.TEACHER).department(mech).build());
         userRepository.save(User.builder().username("teacher_electrical1").password(encodedPassword).fullName("Prof. Suresh Iyer").role(Role.TEACHER).department(electrical).build());

@@ -103,7 +103,7 @@ export default function PrincipalDashboard() {
           <div className="hero-content">
             <h1>Campus Mental Wellness — Principal's Office</h1>
             <p>
-              Welcome, <strong>Principal {user?.fullName}</strong>.
+              Welcome, <strong>{user?.fullName}</strong> (Principal).
               This is your institution-wide view of student mental health and stress support operations
               across all {departments.length} departments. Track every student issue, monitor faculty response rates, 
               and ensure no student falls through the cracks.
@@ -342,8 +342,8 @@ export default function PrincipalDashboard() {
                           )}
                         </td>
                         <td><span style={{ background: '#ffe4e6', color: '#e11d48', fontWeight: 700, padding: '3px 8px', borderRadius: '6px', fontSize: '0.8rem' }}>🔥 {c.stressStreakDays}d</span></td>
-                        <td>{c.assignedBy ? <span style={{ fontWeight: 600 }}>Dr. {c.assignedBy.fullName}</span> : <span style={{ color: '#f59e0b', fontSize: '0.85rem' }}>Pending HOD</span>}</td>
-                        <td>{c.assignedTeacher ? <span style={{ fontWeight: 600, color: '#0369a1' }}>Prof. {c.assignedTeacher.fullName}</span> : <span style={{ color: '#ef4444', fontSize: '0.85rem', fontWeight: 600 }}>Unassigned</span>}</td>
+                        <td>{c.assignedBy ? <span style={{ fontWeight: 600 }}>{c.assignedBy.fullName}</span> : <span style={{ color: '#f59e0b', fontSize: '0.85rem' }}>Pending HOD</span>}</td>
+                        <td>{c.assignedTeacher ? <span style={{ fontWeight: 600, color: '#0369a1' }}>{c.assignedTeacher.fullName}</span> : <span style={{ color: '#ef4444', fontSize: '0.85rem', fontWeight: 600 }}>Unassigned</span>}</td>
                         <td><span className={`status-badge status-${c.status}`}>{c.status.replace('_', ' ')}</span></td>
                         <td style={{ fontSize: '0.85rem', color: 'var(--text-muted)', maxWidth: '200px' }}>{c.teacherSolution ? c.teacherSolution.substring(0, 80) + (c.teacherSolution.length > 80 ? '…' : '') : <span style={{ fontStyle: 'italic' }}>Pending</span>}</td>
                         <td style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{c.trackingStartDate ? `${c.trackingStartDate} → ${c.trackingEndDate}` : '—'}</td>

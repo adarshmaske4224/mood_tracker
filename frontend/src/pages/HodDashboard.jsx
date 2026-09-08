@@ -102,7 +102,7 @@ export default function HodDashboard() {
           <div className="hero-content">
             <h1>{data?.department?.name} — HOD Triage Dashboard</h1>
             <p>
-              Welcome, <strong>Dr. {user?.fullName}</strong> (Head of Department, {data?.department?.code}).
+              Welcome, <strong>{user?.fullName}</strong> (Head of Department, {data?.department?.code}).
               When students are flagged for consecutive high stress, their cases arrive here.
               Your role is to review and <strong>delegate each case to a department teacher</strong> who will
               personally reach out, counsel, and track the student's recovery.
@@ -272,7 +272,7 @@ export default function HodDashboard() {
                         <td style={{ fontWeight: 600 }}>{c.student?.fullName}</td>
                         <td>{c.student?.rollNumber}</td>
                         <td><span style={{ background: '#ffe4e6', color: '#e11d48', fontWeight: 700, padding: '3px 8px', borderRadius: '6px', fontSize: '0.8rem' }}>🔥 {c.stressStreakDays}d</span></td>
-                        <td>{c.assignedTeacher ? <span style={{ fontWeight: 600, color: '#0369a1' }}>Prof. {c.assignedTeacher.fullName}</span> : <span style={{ color: '#ef4444', fontWeight: 600, fontSize: '0.85rem' }}>Unassigned</span>}</td>
+                        <td>{c.assignedTeacher ? <span style={{ fontWeight: 600, color: '#0369a1' }}>{c.assignedTeacher.fullName}</span> : <span style={{ color: '#ef4444', fontWeight: 600, fontSize: '0.85rem' }}>Unassigned</span>}</td>
                         <td><span className={`status-badge status-${c.status}`}>{c.status.replace('_', ' ')}</span></td>
                         <td style={{ fontSize: '0.85rem', color: 'var(--text-muted)', maxWidth: '220px' }}>{c.teacherSolution ? c.teacherSolution.substring(0, 80) + (c.teacherSolution.length > 80 ? '…' : '') : <span style={{ fontStyle: 'italic' }}>Pending</span>}</td>
                         <td style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{c.trackingStartDate ? `${c.trackingStartDate} → ${c.trackingEndDate}` : '—'}</td>
@@ -302,7 +302,7 @@ export default function HodDashboard() {
                         {t.fullName?.charAt(0)}
                       </div>
                       <div>
-                        <h4 style={{ fontSize: '1.05rem', marginBottom: '2px' }}>Prof. {t.fullName}</h4>
+                        <h4 style={{ fontSize: '1.05rem', marginBottom: '2px' }}>{t.fullName}</h4>
                         <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>@{t.username} • {data?.department?.code}</div>
                       </div>
                     </div>
@@ -378,7 +378,7 @@ export default function HodDashboard() {
                           {t.fullName?.charAt(0)}
                         </div>
                         <div style={{ flex: 1 }}>
-                          <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>Prof. {t.fullName}</div>
+                          <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>{t.fullName}</div>
                           <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>@{t.username} • Currently handling: {activeForT} case{activeForT !== 1 ? 's' : ''}</div>
                         </div>
                         <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: `2px solid ${isSelected ? '#0284c7' : '#cbd5e1'}`, background: isSelected ? '#0284c7' : 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
