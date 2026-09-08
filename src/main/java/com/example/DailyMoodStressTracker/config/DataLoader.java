@@ -64,6 +64,7 @@ public class DataLoader implements CommandLineRunner {
         userRepository.save(User.builder().username("teacher_cse3").password(encodedPassword).fullName("Sachin Sir").role(Role.TEACHER).department(cse).build());
         userRepository.save(User.builder().username("teacher_cse4").password(encodedPassword).fullName("Dr. P.B. Niranjane Ma'am").role(Role.TEACHER).department(cse).build());
         userRepository.save(User.builder().username("teacher_cse5").password(encodedPassword).fullName("Khandare Sir").role(Role.TEACHER).department(cse).build());
+        userRepository.save(User.builder().username("teacher_cse6").password(encodedPassword).fullName("Jadhav Sir").role(Role.TEACHER).department(cse).build());
         userRepository.save(User.builder().username("teacher_mech1").password(encodedPassword).fullName("Prof. Vikram Joshi").role(Role.TEACHER).department(mech).build());
         userRepository.save(User.builder().username("teacher_mech2").password(encodedPassword).fullName("Prof. Ritu Mehta").role(Role.TEACHER).department(mech).build());
         userRepository.save(User.builder().username("teacher_electrical1").password(encodedPassword).fullName("Prof. Suresh Iyer").role(Role.TEACHER).department(electrical).build());
