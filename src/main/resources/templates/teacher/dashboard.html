@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Dashboard — Campus MindTrack</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="navbar-brand">
+        <span class="brand-icon">🎓</span>
+        <span>Campus MindTrack</span>
+    </div>
+
+    <ul class="navbar-nav">
+        <li><a href="#hero" class="nav-link active">Home</a></li>
+        <li><a href="#active-cases-section" class="nav-link">Active Cases</a></li>
+        <li><a href="#resolved-section" class="nav-link">Resolved Cases</a></li>
+    </ul>
+
+    <div class="navbar-right">
+        <div class="nav-notification-bell" title="Notifications">🔔</div>
+        <div class="navbar-user">
+            <div class="user-avatar-circle">
+                <span th:text="${teacher.fullName.substring(0, 1)}">T</span>
+            </div>
+            <div>
+                <span th:text="'Hi, ' + ${teacher.fullName.split(' ')[0]}">Hi, Teacher</span>
+                <span class="role-badge teacher" style="margin-left: 0.25rem;">Teacher</span>
+            </div>
+        </div>
+        <a th:href="@{/logout}" class="btn-logout">Logout</a>
+    </div>
+</nav>
+
+<!-- Sky-Blue Hero Banner -->
+<section class="hero-wrapper" id="hero">
+    <div class="hero-container">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                Faculty Mentorship &<br>
+                Student <span class="highlight">Care Center</span>
+            </h1>
+            <p class="hero-subtitle">
+                Review assigned student stress cases delegated by your Department HOD (<strong th:text="${teacher.department.name}"></strong>), prescribe guidance, and monitor 7-day mood recovery.
+            </p>
+
+            <div class="hero-search-box">
+                <input type="text" placeholder="Search assigned students by name or roll number..." readonly>
+                <button class="hero-search-btn" type="button">Filter</button>
+            </div>
+
+            <div class="hero-filter-chips">
+                <a href="#active-cases-section" class="filter-chip active">All Assigned</a>
+                <a href="#active-cases-section" class="filter-chip">Critical Streaks (3+ Days)</a>
+                <a href="#active-cases-section" class="filter-chip">In-Progress</a>
+                <a href="#resolved-section" class="filter-chip">Resolved</a>
+            </div>
+        </div>
+
+        <div class="hero-graphic-card">
+            <div style="font-size: 2.2rem; margin-bottom: 0.35rem;">👩‍🏫 📚 💡</div>
+            <div class="hero-quote-heading">
+                Proactive Student Care
+            </div>
+            <div class="hero-sign-box">
+                Early Intervention · Direct Mentorship · Safe Campus
+            </div>
+            <div class="hero-quote-subtext">
+                “Every student deserves a faculty member who listens and guides them.”
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="main-content">
+
+    <!-- Quick Action Banners -->
+    <div class="quick-actions-row">
+        <a href="#active-cases-section" class="action-card rose">
+            <div class="action-card-left">
+                <div class="action-card-icon">🚨</div>
+                <div class="action-card-text">
+                    <h3>Urgent Support Cases</h3>
+                    <p><span th:text="${activeCases.size()}">0</span> students currently need guidance and stress remediation.</p>
+                </div>
+            </div>
+            <div class="action-card-arrow">➔</div>
+        </a>
+
+        <a href="#resolved-section" class="action-card emerald">
+            <div class="action-card-left">
+                <div class="action-card-icon">✅</div>
+                <div class="action-card-text">
+                    <h3>Resolved & Monitored</h3>
+                    <p>Review past interventions and stabilized student mood trends.</p>
+                </div>
+            </div>
+            <div class="action-card-arrow">➔</div>
+        </a>
+    </div>
+
+    <!-- Alert Messages -->
+    <div th:if="${success}" class="alert alert-success">
+        ✅ <span th:text="${success}"></span>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="grid-3" style="margin-bottom: 2rem;">
+        <div class="stat-card red">
+            <div class="stat-icon">📋</div>
+            <div class="stat-value" th:text="${activeCases.size()}">0</div>
+            <div class="stat-label">Active Support Cases</div>
+        </div>
+        <div class="stat-card blue">
+            <div class="stat-icon">🔍</div>
+            <div class="stat-value" th:text="${allCases.stream().filter(c -> c.status.name() == 'IN_PROGRESS').count()}">0</div>
+            <div class="stat-label">In Progress Tracking</div>
+        </div>
+        <div class="stat-card green">
+            <div class="stat-icon">✅</div>
+            <div class="stat-value" th:text="${allCases.stream().filter(c -> c.status.name() == 'RESOLVED').count()}">0</div>
+            <div class="stat-label">Successfully Resolved</div>
+        </div>
+    </div>
+
+    <!-- Active Cases Section -->
+    <div class="card-header" id="active-cases-section">
+        <span class="card-title">🚨 Assigned Students Requiring Mentorship</span>
+        <span class="card-link">Department of <span th:text="${teacher.department.code}"></span></span>
+    </div>
+
+    <div th:if="${activeCases.isEmpty()}" class="empty-state" style="margin-bottom: 2rem;">
+        <div class="empty-icon">🎉</div>
+        <p>No active cases assigned to you right now. All students in your care are in healthy standing!</p>
+    </div>
+
+    <div th:if="${!activeCases.isEmpty()}" style="display: flex; flex-direction: column; gap: 1.25rem; margin-bottom: 2.5rem;">
+        <div th:each="case_ : ${activeCases}" class="case-card">
+            <div class="student-info">
+                <div class="student-avatar" th:text="${#strings.substring(case_.student.fullName, 0, 1)}"></div>
+                <div>
+                    <div class="student-name" th:text="${case_.student.fullName}"></div>
+                    <div class="student-meta">
+                        <span th:text="${case_.student.rollNumber}"></span> ·
+                        <span th:text="${case_.student.department.code}"></span> ·
+                        <span class="status-badge flagged" style="margin-left: 0.25rem;">
+                            🔥 <span th:text="${case_.stressStreakDays}"></span> Days High Stress
+                        </span>
+                    </div>
+                </div>
+                <span class="status-badge" style="margin-left: auto;"
+                      th:classappend="${case_.status.name() == 'ASSIGNED' ? 'assigned' : 'in-progress'}"
+                      th:text="${case_.status}"></span>
+            </div>
+
+            <!-- Solution form or existing solution -->
+            <div th:if="${case_.teacherSolution != null}" class="solution-box">
+                <div class="solution-title">💡 Your Prescribed Solution & Advice</div>
+                <p class="solution-text" th:text="${case_.teacherSolution}"></p>
+                <div style="margin-top: 0.85rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                    <span class="tracking-badge" th:if="${case_.trackingEndDate != null}">
+                        <span class="dot"></span>
+                        Mood tracking active until <span th:text="${case_.trackingEndDate}"></span>
+                    </span>
+                    <form th:action="@{'/teacher/resolve/' + ${case_.id}}" method="post" style="margin-left: auto;">
+                        <button type="submit" class="btn btn-success btn-sm">✅ Mark Resolved</button>
+                    </form>
+                </div>
+            </div>
+
+            <div style="margin-top: 1rem; display: flex; gap: 0.75rem;">
+                <a th:href="@{'/teacher/student/' + ${case_.id}}" class="btn btn-primary btn-sm">
+                    📊 View Mood History & Prescribe Solution
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resolved Cases Section -->
+    <div id="resolved-section" th:if="${!allCases.stream().filter(c -> c.status.name() == 'RESOLVED').toList().isEmpty()}">
+        <div class="card-header">
+            <span class="card-title">✅ Resolved Cases History</span>
+            <span style="font-size: 0.82rem; color: var(--text-muted);">Stabilized Students</span>
+        </div>
+        <div class="table-container" style="margin-bottom: 2rem;">
+            <table class="data-table">
+                <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Roll Number</th>
+                    <th>Department</th>
+                    <th>Stress Streak</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="case_ : ${allCases}" th:if="${case_.status.name() == 'RESOLVED'}">
+                    <td style="font-weight: 600;" th:text="${case_.student.fullName}"></td>
+                    <td th:text="${case_.student.rollNumber}"></td>
+                    <td th:text="${case_.student.department.code}"></td>
+                    <td>
+                        <span class="status-badge assigned" th:text="${case_.stressStreakDays + ' days'}"></span>
+                    </td>
+                    <td><span class="status-badge resolved">Resolved</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Campus Footer -->
+<footer class="campus-footer">
+    <div class="campus-footer-content">
+        <div class="campus-footer-brand">
+            <span style="font-size: 1.4rem;">🎓</span>
+            <div>
+                <strong>Campus MindTrack</strong>
+                <span class="footer-tagline">Track Stress. Support Students. Build a Kinder Campus.</span>
+            </div>
+        </div>
+
+        <ul class="campus-footer-links">
+            <li><a href="#hero">Faculty Guide</a></li>
+            <li><a href="#hero">Intervention Protocols</a></li>
+            <li><a href="#hero">Counseling Desk</a></li>
+            <li><a href="#hero">Student Welfare Policy</a></li>
+        </ul>
+
+        <div class="campus-footer-right">
+            <div class="campus-footer-socials">
+                <span>📷</span>
+                <span>🐦</span>
+                <span>💼</span>
+                <span>📺</span>
+            </div>
+            <div>Made with ❤️ for our campus</div>
+        </div>
+    </div>
+</footer>
+
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HOD Dashboard — Campus MindTrack</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="navbar-brand">
+        <span class="brand-icon">🎓</span>
+        <span>Campus MindTrack</span>
+    </div>
+
+    <ul class="navbar-nav">
+        <li><a href="#hero" class="nav-link active">Home</a></li>
+        <li><a href="#flagged-section" class="nav-link">Flagged Cases</a></li>
+        <li><a href="#history-section" class="nav-link">Department History</a></li>
+    </ul>
+
+    <div class="navbar-right">
+        <div class="nav-notification-bell" title="Notifications">🔔</div>
+        <div class="navbar-user">
+            <div class="user-avatar-circle">
+                <span th:text="${hod.fullName.substring(0, 1)}">H</span>
+            </div>
+            <div>
+                <span th:text="'Hi, ' + ${hod.fullName.split(' ')[0]}">Hi, HOD</span>
+                <span class="role-badge hod" style="margin-left: 0.25rem;">HOD</span>
+            </div>
+        </div>
+        <a th:href="@{/logout}" class="btn-logout">Logout</a>
+    </div>
+</nav>
+
+<!-- Sky-Blue Hero Banner -->
+<section class="hero-wrapper" id="hero">
+    <div class="hero-container">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                Department Leadership &<br>
+                Faculty <span class="highlight">Delegation</span>
+            </h1>
+            <p class="hero-subtitle">
+                Department of <strong th:text="${department.name}"></strong>. Supervise student wellness escalations, assign dedicated faculty mentors to flagged high-stress students, and verify resolution.
+            </p>
+
+            <div class="hero-search-box">
+                <input type="text" placeholder="Search department students, roll number or faculty mentor..." readonly>
+                <button class="hero-search-btn" type="button">Search</button>
+            </div>
+
+            <div class="hero-filter-chips">
+                <a href="#flagged-section" class="filter-chip active">All Cases</a>
+                <a href="#flagged-section" class="filter-chip">Unassigned (Action Required)</a>
+                <a href="#flagged-section" class="filter-chip">Assigned</a>
+                <a href="#history-section" class="filter-chip">Resolved Archive</a>
+            </div>
+        </div>
+
+        <div class="hero-graphic-card">
+            <div style="font-size: 2.2rem; margin-bottom: 0.35rem;">🏛️ 📋 🤝</div>
+            <div class="hero-quote-heading">
+                Department Oversight
+            </div>
+            <div class="hero-sign-box">
+                Fast Delegation · Mentor Allocation · Student Relief
+            </div>
+            <div class="hero-quote-subtext">
+                “Connecting struggling students with compassionate teachers transforms campus life.”
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="main-content">
+
+    <!-- Quick Action Banners -->
+    <div class="quick-actions-row">
+        <a href="#flagged-section" class="action-card rose">
+            <div class="action-card-left">
+                <div class="action-card-icon">🚨</div>
+                <div class="action-card-text">
+                    <h3>Pending Teacher Delegation</h3>
+                    <p><span th:text="${flaggedCount}">0</span> students need faculty mentors assigned.</p>
+                </div>
+            </div>
+            <div class="action-card-arrow">➔</div>
+        </a>
+
+        <a href="#history-section" class="action-card blue">
+            <div class="action-card-left">
+                <div class="action-card-icon">📊</div>
+                <div class="action-card-text">
+                    <h3>Department Wellness Pulse</h3>
+                    <p><span th:text="${resolvedCount}">0</span> total cases resolved this semester.</p>
+                </div>
+            </div>
+            <div class="action-card-arrow">➔</div>
+        </a>
+    </div>
+
+    <!-- Alert Messages -->
+    <div th:if="${success}" class="alert alert-success">
+        ✅ <span th:text="${success}"></span>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="grid-4" style="margin-bottom: 2rem;">
+        <div class="stat-card red">
+            <div class="stat-icon">🚨</div>
+            <div class="stat-value" th:text="${flaggedCount}">0</div>
+            <div class="stat-label">Needs Teacher</div>
+        </div>
+        <div class="stat-card amber">
+            <div class="stat-icon">👩‍🏫</div>
+            <div class="stat-value" th:text="${assignedCount}">0</div>
+            <div class="stat-label">Assigned to Faculty</div>
+        </div>
+        <div class="stat-card blue">
+            <div class="stat-icon">🔍</div>
+            <div class="stat-value" th:text="${inProgressCount}">0</div>
+            <div class="stat-label">In Progress</div>
+        </div>
+        <div class="stat-card green">
+            <div class="stat-icon">✅</div>
+            <div class="stat-value" th:text="${resolvedCount}">0</div>
+            <div class="stat-label">Resolved</div>
+        </div>
+    </div>
+
+    <!-- Flagged Students Table Section -->
+    <div class="card-header" id="flagged-section">
+        <span class="card-title">🚨 Active Department Cases & Faculty Delegation</span>
+        <span class="card-link"><span th:text="${department.code}"></span> Faculty List</span>
+    </div>
+
+    <div th:if="${activeCases.isEmpty()}" class="empty-state" style="margin-bottom: 2rem;">
+        <div class="empty-icon">🎉</div>
+        <p>No active cases in your department right now. All students are in healthy condition!</p>
+    </div>
+
+    <div class="table-container" th:if="${!activeCases.isEmpty()}" style="margin-bottom: 2.5rem;">
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>Student</th>
+                <th>Roll No.</th>
+                <th>Stress Streak</th>
+                <th>Status</th>
+                <th>Assigned Teacher</th>
+                <th>Delegate Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="case_ : ${activeCases}">
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <div class="student-avatar" style="width: 36px; height: 36px; font-size: 0.85rem;"
+                             th:text="${#strings.substring(case_.student.fullName, 0, 1)}"></div>
+                        <span style="font-weight: 600;" th:text="${case_.student.fullName}"></span>
+                    </div>
+                </td>
+                <td th:text="${case_.student.rollNumber}"></td>
+                <td>
+                    <span class="status-badge flagged">
+                        🔥 <span th:text="${case_.stressStreakDays + ' days'}"></span>
+                    </span>
+                </td>
+                <td>
+                    <span class="status-badge"
+                          th:classappend="${case_.status.name() == 'FLAGGED' ? 'flagged' :
+                                           case_.status.name() == 'ASSIGNED' ? 'assigned' : 'in-progress'}"
+                          th:text="${case_.status}"></span>
+                </td>
+                <td style="font-weight: 500;" th:text="${case_.assignedTeacher != null ? case_.assignedTeacher.fullName : '— Not Yet Assigned —'}"></td>
+                <td>
+                    <!-- Assignment form (only for FLAGGED cases) -->
+                    <form th:if="${case_.status.name() == 'FLAGGED'}"
+                          th:action="@{'/hod/assign/' + ${case_.id}}" method="post" style="display: flex; gap: 0.5rem; align-items: center;">
+                        <select name="teacherId" class="form-select" style="padding: 0.4rem 0.6rem; font-size: 0.82rem; width: auto;" required>
+                            <option value="">Select Mentor</option>
+                            <option th:each="teacher : ${teachers}"
+                                    th:value="${teacher.id}"
+                                    th:text="${teacher.fullName}"></option>
+                        </select>
+                        <button type="submit" class="btn btn-primary btn-sm">Assign</button>
+                    </form>
+                    <span th:if="${case_.status.name() != 'FLAGGED'}" class="status-badge in-progress">
+                        Assigned
+                    </span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- All Cases History Table -->
+    <div id="history-section" th:if="${!allCases.isEmpty()}">
+        <div class="card-header">
+            <span class="card-title">📊 All Department Cases History</span>
+            <span style="font-size: 0.82rem; color: var(--text-muted);">Semester Log</span>
+        </div>
+        <div class="table-container" style="margin-bottom: 2rem;">
+            <table class="data-table">
+                <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Roll No.</th>
+                    <th>Stress Streak</th>
+                    <th>Status</th>
+                    <th>Assigned Faculty</th>
+                    <th>Logged Date</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="case_ : ${allCases}">
+                    <td style="font-weight: 600;" th:text="${case_.student.fullName}"></td>
+                    <td th:text="${case_.student.rollNumber}"></td>
+                    <td>
+                        <span class="status-badge assigned" th:text="${case_.stressStreakDays + ' days'}"></span>
+                    </td>
+                    <td>
+                        <span class="status-badge"
+                              th:classappend="${case_.status.name() == 'FLAGGED' ? 'flagged' :
+                                               case_.status.name() == 'ASSIGNED' ? 'assigned' :
+                                               case_.status.name() == 'IN_PROGRESS' ? 'in-progress' : 'resolved'}"
+                              th:text="${case_.status}"></span>
+                    </td>
+                    <td th:text="${case_.assignedTeacher != null ? case_.assignedTeacher.fullName : '—'}"></td>
+                    <td th:text="${#temporals.format(case_.createdAt, 'MMM dd, yyyy')}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Campus Footer -->
+<footer class="campus-footer">
+    <div class="campus-footer-content">
+        <div class="campus-footer-brand">
+            <span style="font-size: 1.4rem;">🎓</span>
+            <div>
+                <strong>Campus MindTrack</strong>
+                <span class="footer-tagline">Track Stress. Support Students. Build a Kinder Campus.</span>
+            </div>
+        </div>
+
+        <ul class="campus-footer-links">
+            <li><a href="#hero">Department Protocols</a></li>
+            <li><a href="#hero">Academic Board</a></li>
+            <li><a href="#hero">Counseling Center</a></li>
+            <li><a href="#hero">Confidentiality</a></li>
+        </ul>
+
+        <div class="campus-footer-right">
+            <div class="campus-footer-socials">
+                <span>📷</span>
+                <span>🐦</span>
+                <span>💼</span>
+                <span>📺</span>
+            </div>
+            <div>Made with ❤️ for our campus</div>
+        </div>
+    </div>
+</footer>
+
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

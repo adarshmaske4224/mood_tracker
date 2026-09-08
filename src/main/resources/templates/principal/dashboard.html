@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Principal Dashboard — Campus MindTrack</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="navbar-brand">
+        <span class="brand-icon">🎓</span>
+        <span>Campus MindTrack</span>
+    </div>
+
+    <ul class="navbar-nav">
+        <li><a href="#hero" class="nav-link active">Overview</a></li>
+        <li><a href="#departments-section" class="nav-link">Departments</a></li>
+        <li><a href="#active-cases-section" class="nav-link">College Alerts</a></li>
+    </ul>
+
+    <div class="navbar-right">
+        <div class="nav-notification-bell" title="Notifications">🔔</div>
+        <div class="navbar-user">
+            <div class="user-avatar-circle">
+                <span th:text="${principal.fullName.substring(0, 1)}">P</span>
+            </div>
+            <div>
+                <span th:text="'Hi, ' + ${principal.fullName.split(' ')[0]}">Hi, Principal</span>
+                <span class="role-badge principal" style="margin-left: 0.25rem;">Principal</span>
+            </div>
+        </div>
+        <a th:href="@{/logout}" class="btn-logout">Logout</a>
+    </div>
+</nav>
+
+<!-- Sky-Blue Hero Banner -->
+<section class="hero-wrapper" id="hero">
+    <div class="hero-container">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                College Mental Health &<br>
+                Institutional <span class="highlight">Oversight</span>
+            </h1>
+            <p class="hero-subtitle">
+                Comprehensive macro-level view of student well-being across all 5 departments (CSE, MECH, ELECTRICAL, CIVIL, AIDS). Track escalations from HODs and mentors.
+            </p>
+
+            <div class="hero-search-box">
+                <input type="text" placeholder="Search across all college departments, students, or faculty..." readonly>
+                <button class="hero-search-btn" type="button">Inspect</button>
+            </div>
+
+            <div class="hero-filter-chips">
+                <a href="#departments-section" class="filter-chip active">All Departments (5)</a>
+                <a href="#active-cases-section" class="filter-chip">High-Stress Alerts</a>
+                <a href="#active-cases-section" class="filter-chip">Active Mentorships</a>
+                <a href="#departments-section" class="filter-chip">Campus Analytics</a>
+            </div>
+        </div>
+
+        <div class="hero-graphic-card">
+            <div style="font-size: 2.2rem; margin-bottom: 0.35rem;">🏛️ 🎓 ✨</div>
+            <div class="hero-quote-heading">
+                Campus-Wide Well-Being
+            </div>
+            <div class="hero-sign-box">
+                Real-Time Health Index · Zero Student Left Behind
+            </div>
+            <div class="hero-quote-subtext">
+                “A flourishing institution is built on happy, healthy, and supported minds.”
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="main-content">
+
+    <!-- Quick Action Banners -->
+    <div class="quick-actions-row">
+        <a href="#active-cases-section" class="action-card rose">
+            <div class="action-card-left">
+                <div class="action-card-icon">🚨</div>
+                <div class="action-card-text">
+                    <h3>College-Wide Flagged Students</h3>
+                    <p><span th:text="${totalFlagged}">0</span> students across departments flagged with high stress.</p>
+                </div>
+            </div>
+            <div class="action-card-arrow">➔</div>
+        </a>
+
+        <a href="#departments-section" class="action-card emerald">
+            <div class="action-card-left">
+                <div class="action-card-icon">🏫</div>
+                <div class="action-card-text">
+                    <h3>5 Department Health Status</h3>
+                    <p><span th:text="${totalResolved}">0</span> student cases successfully resolved and stabilized.</p>
+                </div>
+            </div>
+            <div class="action-card-arrow">➔</div>
+        </a>
+    </div>
+
+    <!-- Alert Messages -->
+    <div th:if="${success}" class="alert alert-success">
+        ✅ <span th:text="${success}"></span>
+    </div>
+
+    <!-- Global Stats -->
+    <div class="grid-4" style="margin-bottom: 2rem;">
+        <div class="stat-card blue">
+            <div class="stat-icon">🎓</div>
+            <div class="stat-value" th:text="${totalStudents}">0</div>
+            <div class="stat-label">Total Enrolled Students</div>
+        </div>
+        <div class="stat-card red">
+            <div class="stat-icon">🚨</div>
+            <div class="stat-value" th:text="${totalFlagged}">0</div>
+            <div class="stat-label">Needs Attention</div>
+        </div>
+        <div class="stat-card amber">
+            <div class="stat-icon">🔄</div>
+            <div class="stat-value" th:text="${totalInProgress}">0</div>
+            <div class="stat-label">Faculty In-Progress</div>
+        </div>
+        <div class="stat-card green">
+            <div class="stat-icon">✅</div>
+            <div class="stat-value" th:text="${totalResolved}">0</div>
+            <div class="stat-label">Resolved Cases</div>
+        </div>
+    </div>
+
+    <!-- Department Overview Cards -->
+    <div class="card-header" id="departments-section">
+        <span class="card-title">🏫 Department-wise Stress & Well-Being Status</span>
+        <span class="card-link">5 Active Departments</span>
+    </div>
+
+    <div class="grid-5" style="margin-bottom: 2.5rem;">
+        <div th:each="dept : ${departments}" class="dept-card">
+            <div class="dept-name" th:text="${dept.code}"></div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.85rem;" th:text="${dept.name}"></div>
+            <div class="dept-stats" th:with="stats=${departmentStats[dept.name]}">
+                <div class="dept-stat">
+                    <div class="dept-stat-value info" th:text="${stats != null ? stats['totalStudents'] : 0}">0</div>
+                    <div class="dept-stat-label">Students</div>
+                </div>
+                <div class="dept-stat">
+                    <div class="dept-stat-value danger" th:text="${stats != null ? stats['flagged'] : 0}">0</div>
+                    <div class="dept-stat-label">Flagged</div>
+                </div>
+                <div class="dept-stat">
+                    <div class="dept-stat-value warning" th:text="${stats != null ? stats['activeCases'] : 0}">0</div>
+                    <div class="dept-stat-label">Active</div>
+                </div>
+                <div class="dept-stat">
+                    <div class="dept-stat-value success" th:text="${stats != null ? stats['resolved'] : 0}">0</div>
+                    <div class="dept-stat-label">Resolved</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- All Active Cases -->
+    <div class="card-header" id="active-cases-section">
+        <span class="card-title">🚨 Active Cases Across the Campus</span>
+        <span style="font-size: 0.82rem; color: var(--text-muted);">Real-time Escalation Feed</span>
+    </div>
+
+    <div th:if="${allActiveCases.isEmpty()}" class="empty-state" style="margin-bottom: 2rem;">
+        <div class="empty-icon">🎉</div>
+        <p>No active stress escalations across any department. Campus mental health index is optimal!</p>
+    </div>
+
+    <div class="table-container" th:if="${!allActiveCases.isEmpty()}" style="margin-bottom: 2rem;">
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>Student</th>
+                <th>Roll No.</th>
+                <th>Department</th>
+                <th>Stress Streak</th>
+                <th>Status</th>
+                <th>Assigned Teacher</th>
+                <th>Logged Date</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="case_ : ${allActiveCases}">
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <div class="student-avatar" style="width: 36px; height: 36px; font-size: 0.85rem;"
+                             th:text="${#strings.substring(case_.student.fullName, 0, 1)}"></div>
+                        <span style="font-weight: 600;" th:text="${case_.student.fullName}"></span>
+                    </div>
+                </td>
+                <td th:text="${case_.student.rollNumber}"></td>
+                <td>
+                    <span class="status-badge in-progress" th:text="${case_.student.department.code}"></span>
+                </td>
+                <td>
+                    <span class="status-badge flagged">
+                        🔥 <span th:text="${case_.stressStreakDays + ' days'}"></span>
+                    </span>
+                </td>
+                <td>
+                    <span class="status-badge"
+                          th:classappend="${case_.status.name() == 'FLAGGED' ? 'flagged' :
+                                           case_.status.name() == 'ASSIGNED' ? 'assigned' : 'in-progress'}"
+                          th:text="${case_.status}"></span>
+                </td>
+                <td style="font-weight: 500;" th:text="${case_.assignedTeacher != null ? case_.assignedTeacher.fullName : '— Pending HOD —'}"></td>
+                <td th:text="${#temporals.format(case_.createdAt, 'MMM dd, yyyy')}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- Campus Footer -->
+<footer class="campus-footer">
+    <div class="campus-footer-content">
+        <div class="campus-footer-brand">
+            <span style="font-size: 1.4rem;">🎓</span>
+            <div>
+                <strong>Campus MindTrack</strong>
+                <span class="footer-tagline">Track Stress. Support Students. Build a Kinder Campus.</span>
+            </div>
+        </div>
+
+        <ul class="campus-footer-links">
+            <li><a href="#hero">Institutional Charter</a></li>
+            <li><a href="#hero">Health Committee</a></li>
+            <li><a href="#hero">Annual Reports</a></li>
+            <li><a href="#hero">Student Welfare Policy</a></li>
+        </ul>
+
+        <div class="campus-footer-right">
+            <div class="campus-footer-socials">
+                <span>📷</span>
+                <span>🐦</span>
+                <span>💼</span>
+                <span>📺</span>
+            </div>
+            <div>Made with ❤️ for our campus</div>
+        </div>
+    </div>
+</footer>
+
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

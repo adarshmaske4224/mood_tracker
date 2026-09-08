@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard — Campus MindTrack</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="navbar-brand">
+        <span class="brand-icon">🎓</span>
+        <span>Campus MindTrack</span>
+    </div>
+
+    <ul class="navbar-nav">
+        <li><a href="#hero" class="nav-link active">Home</a></li>
+        <li><a href="#log-section" class="nav-link">Log Mood</a></li>
+        <li><a href="#chart-section" class="nav-link">Weekly Trends</a></li>
+        <li><a href="#history-section" class="nav-link">My Entries</a></li>
+    </ul>
+
+    <div class="navbar-right">
+        <div class="nav-notification-bell" title="Notifications">🔔</div>
+        <div class="navbar-user">
+            <div class="user-avatar-circle">
+                <span th:text="${student.fullName.substring(0, 1)}">S</span>
+            </div>
+            <div>
+                <span th:text="'Hi, ' + ${student.fullName.split(' ')[0]}">Hi, Student</span>
+                <span class="role-badge student" style="margin-left: 0.25rem;">Student</span>
+            </div>
+        </div>
+        <a th:href="@{/logout}" class="btn-logout">Logout</a>
+    </div>
+</nav>
+
+<!-- Sky-Blue Hero Section (Matching Reference Aesthetic) -->
+<section class="hero-wrapper" id="hero">
+    <div class="hero-container">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                Feeling Stressed?<br>
+                We Help You <span class="highlight">Balance It.</span>
+            </h1>
+            <p class="hero-subtitle">
+                A centralized mental wellness platform for our campus community to monitor stress levels, track mood changes, and receive proactive faculty guidance.
+            </p>
+
+            <!-- Search / Quick Filter Bar -->
+            <div class="hero-search-box">
+                <input type="text" placeholder="Search resources (e.g. exam anxiety, sleep tips, faculty mentor)..." readonly>
+                <button class="hero-search-btn" type="button">Explore</button>
+            </div>
+
+            <div class="hero-filter-chips">
+                <a href="#log-section" class="filter-chip active">All</a>
+                <a href="#log-section" class="filter-chip">Daily Mood Log</a>
+                <a href="#chart-section" class="filter-chip">Weekly Analytics</a>
+                <a href="#active-case-sec" class="filter-chip">Faculty Support</a>
+                <a href="#history-section" class="filter-chip">Past Entries</a>
+            </div>
+        </div>
+
+        <!-- Right Campus Graphic Card -->
+        <div class="hero-graphic-card">
+            <div style="font-size: 2.2rem; margin-bottom: 0.35rem;">🌱 🤝 💙</div>
+            <div class="hero-quote-heading">
+                A Kinder Campus Together
+            </div>
+            <div class="hero-sign-box">
+                Track Mood · Share Feelings · Get Mentor Care
+            </div>
+            <div class="hero-quote-subtext">
+                “Taking care of your mind is as important as earning your degree.”
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Body -->
+<div class="main-content">
+
+    <!-- Quick Action Banners (Pink & Green Banners like Reference) -->
+    <div class="quick-actions-row">
+        <a href="#log-section" class="action-card rose">
+            <div class="action-card-left">
+                <div class="action-card-icon">📣</div>
+                <div class="action-card-text">
+                    <h3>Log Today's Mood</h3>
+                    <p>Share your day & feelings. AI instantly evaluates stress.</p>
+                </div>
+            </div>
+            <div class="action-card-arrow">➔</div>
+        </a>
+
+        <a href="#active-case-sec" class="action-card emerald">
+            <div class="action-card-left">
+                <div class="action-card-icon">🌿</div>
+                <div class="action-card-text">
+                    <h3>Faculty & Counseling Support</h3>
+                    <p>Get personalized guidance from your department teachers.</p>
+                </div>
+            </div>
+            <div class="action-card-arrow">➔</div>
+        </a>
+    </div>
+
+    <!-- Alert Messages -->
+    <div th:if="${success}" class="alert alert-success">
+        ✅ <span th:text="${success}"></span>
+    </div>
+
+    <!-- Active Support Case Notification -->
+    <div id="active-case-sec" th:if="${activeCase != null}" class="card" style="border-left: 4px solid var(--accent-blue);">
+        <div class="card-header">
+            <span class="card-title">📋 Active Support Case</span>
+            <span class="status-badge"
+                  th:classappend="${activeCase.status.name() == 'FLAGGED' ? 'flagged' :
+                                   activeCase.status.name() == 'ASSIGNED' ? 'assigned' :
+                                   activeCase.status.name() == 'IN_PROGRESS' ? 'in-progress' : 'resolved'}"
+                  th:text="${activeCase.status}"></span>
+        </div>
+
+        <div th:if="${activeCase.status.name() == 'FLAGGED'}">
+            <p style="color: var(--text-secondary); font-size: 0.92rem;">
+                🔔 Elevated stress detected over multiple days. Your Department HOD (<strong th:text="${student.department.name}"></strong>) has been alerted and is assigning a faculty mentor to support you.
+            </p>
+        </div>
+        <div th:if="${activeCase.status.name() == 'ASSIGNED'}">
+            <p style="color: var(--text-secondary); font-size: 0.92rem;">
+                👩‍🏫 Case assigned to faculty mentor <strong th:text="${activeCase.assignedTeacher.fullName}"></strong>. They are reviewing your situation and will provide personalized advice shortly.
+            </p>
+        </div>
+        <div th:if="${activeCase.status.name() == 'IN_PROGRESS'}">
+            <div class="solution-box">
+                <div class="solution-title">💡 Mentor Advice & Action Plan (from <span th:text="${activeCase.assignedTeacher.fullName}"></span>):</div>
+                <p class="solution-text" th:text="${activeCase.teacherSolution}"></p>
+            </div>
+            <div style="margin-top: 0.85rem;">
+                <span class="tracking-badge">
+                    <span class="dot"></span>
+                    Mood being actively tracked by faculty until <span th:text="${activeCase.trackingEndDate}"></span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Two Column Layout -->
+    <div class="dashboard-layout">
+
+        <!-- Left Column: Mood Logger & Chart -->
+        <div>
+            <!-- Mood Logger Card -->
+            <div class="card" id="log-section">
+                <div class="card-header">
+                    <span class="card-title">📝 Daily Mood & Stress Check-in</span>
+                    <span th:if="${todayEntry != null}" style="color: var(--accent-emerald); font-weight: 700; font-size: 0.82rem;">
+                        ✓ Logged for Today
+                    </span>
+                </div>
+
+                <form th:action="@{/student/log}" method="post" onsubmit="return validateMoodForm()">
+                    <!-- Mood Picker -->
+                    <div class="form-group">
+                        <label class="form-label">How are you feeling today?</label>
+                        <div class="mood-picker">
+                            <label class="mood-option" th:classappend="${todayEntry != null && todayEntry.mood == 1 ? 'selected' : ''}">
+                                <input type="radio" name="mood" value="1" th:checked="${todayEntry != null && todayEntry.mood == 1}">
+                                <span class="mood-emoji">😢</span>
+                                <span class="mood-label">Awful</span>
+                            </label>
+                            <label class="mood-option" th:classappend="${todayEntry != null && todayEntry.mood == 2 ? 'selected' : ''}">
+                                <input type="radio" name="mood" value="2" th:checked="${todayEntry != null && todayEntry.mood == 2}">
+                                <span class="mood-emoji">😟</span>
+                                <span class="mood-label">Low</span>
+                            </label>
+                            <label class="mood-option" th:classappend="${todayEntry != null && todayEntry.mood == 3 ? 'selected' : ''}">
+                                <input type="radio" name="mood" value="3" th:checked="${todayEntry != null && todayEntry.mood == 3}">
+                                <span class="mood-emoji">😐</span>
+                                <span class="mood-label">Okay</span>
+                            </label>
+                            <label class="mood-option" th:classappend="${todayEntry != null && todayEntry.mood == 4 ? 'selected' : ''}">
+                                <input type="radio" name="mood" value="4" th:checked="${todayEntry != null && todayEntry.mood == 4}">
+                                <span class="mood-emoji">🙂</span>
+                                <span class="mood-label">Good</span>
+                            </label>
+                            <label class="mood-option" th:classappend="${todayEntry != null && todayEntry.mood == 5 ? 'selected' : ''}">
+                                <input type="radio" name="mood" value="5" th:checked="${todayEntry != null && todayEntry.mood == 5}">
+                                <span class="mood-emoji">😄</span>
+                                <span class="mood-label">Great</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Notes (AI Input) -->
+                    <div class="form-group">
+                        <label class="form-label" for="mood-notes">Daily Journal & Notes (AI Stress Calculation)</label>
+                        <textarea id="mood-notes" name="notes" class="form-textarea"
+                                  placeholder="What happened today? Write about academics, exams, workload, family, or sleep... Our AI analyzes your sentiment to calculate stress level."
+                                  th:text="${todayEntry != null ? todayEntry.notes : ''}"></textarea>
+                        <div id="analysis-preview" class="ai-analysis-box" style="display: none;"></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">
+                        🤖 Submit & Analyze Stress
+                    </button>
+                </form>
+
+                <!-- Show today's AI analysis if exists -->
+                <div th:if="${todayEntry != null && todayEntry.aiAnalysis != null}" class="ai-analysis-box" style="margin-top: 1.25rem;">
+                    <div class="ai-label">🤖 AI Stress Evaluation</div>
+                    <div class="ai-text" th:text="${todayEntry.aiAnalysis}"></div>
+                    <div style="margin-top: 0.65rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+                        Calculated Stress Level:
+                        <span class="status-badge"
+                              th:classappend="${todayEntry.stressLevel >= 7 ? 'flagged' : (todayEntry.stressLevel >= 4 ? 'assigned' : 'resolved')}"
+                              th:text="${todayEntry.stressLevel} + ' / 10'">
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weekly Trend Chart -->
+            <div class="card" id="chart-section">
+                <div class="card-header">
+                    <span class="card-title">📊 7-Day Mood & Stress Patterns</span>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">Real-time tracking</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="moodChart"
+                            th:data-dates="${dates}"
+                            th:data-moods="${moods}"
+                            th:data-stress="${stressLevels}">
+                    </canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Sidebar (Stats, Campus Tip, Recent History) -->
+        <div>
+            <!-- Quick Stats Sidebar (Purple, Green, Blue mini boxes like Reference) -->
+            <div class="quick-stats-sidebar">
+                <div class="quick-stats-sidebar-title">Quick Stats</div>
+                <div class="quick-stats-grid">
+                    <div class="quick-stat-box purple">
+                        <div class="quick-stat-box-icon">📅</div>
+                        <div class="quick-stat-box-num" th:text="${weeklyEntries.size()}">0</div>
+                        <div class="quick-stat-box-label">Days Logged</div>
+                    </div>
+                    <div class="quick-stat-box green">
+                        <div class="quick-stat-box-icon">🌿</div>
+                        <div class="quick-stat-box-num" th:text="${todayEntry != null ? todayEntry.mood : '-'}">-</div>
+                        <div class="quick-stat-box-label">Today Mood</div>
+                    </div>
+                    <div class="quick-stat-box blue">
+                        <div class="quick-stat-box-icon">⚡</div>
+                        <div class="quick-stat-box-num" th:text="${todayEntry != null ? todayEntry.stressLevel : '-'}">-</div>
+                        <div class="quick-stat-box-label">Stress /10</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Campus Tip Box (Yellow Bulb Banner like Reference) -->
+            <div class="campus-tip-card">
+                <div class="campus-tip-left">
+                    <div class="campus-tip-icon">💡</div>
+                    <div class="campus-tip-text">
+                        <h4>Let's Keep Our Campus Healthy</h4>
+                        <p>Log daily. When stress stays high for 3+ days, teachers step in to help.</p>
+                    </div>
+                </div>
+                <div class="campus-tip-btn">➔</div>
+            </div>
+
+            <!-- Recent Entries Card -->
+            <div class="card" id="history-section">
+                <div class="card-header">
+                    <span class="card-title">🕒 Recent Check-ins</span>
+                    <span class="card-link">Past 7 Days</span>
+                </div>
+
+                <div class="entry-list" th:if="${!weeklyEntries.isEmpty()}">
+                    <div th:each="entry : ${weeklyEntries}" class="entry-item">
+                        <span class="entry-date" th:text="${#temporals.format(entry.date, 'MMM dd')}"></span>
+                        <span class="entry-mood" th:text="${moodLabels[entry.mood]}"></span>
+                        <span class="entry-stress"
+                              th:classappend="${entry.stressLevel >= 7 ? 'high' : (entry.stressLevel >= 4 ? 'medium' : 'low')}"
+                              th:text="'Stress ' + ${entry.stressLevel} + '/10'"></span>
+                    </div>
+                </div>
+                <div th:if="${weeklyEntries.isEmpty()}" class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <p>No entries yet. Start logging your mood today!</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Campus Footer (Dark Navy like Reference) -->
+<footer class="campus-footer">
+    <div class="campus-footer-content">
+        <div class="campus-footer-brand">
+            <span style="font-size: 1.4rem;">🎓</span>
+            <div>
+                <strong>Campus MindTrack</strong>
+                <span class="footer-tagline">Track Stress. Support Students. Build a Kinder Campus.</span>
+            </div>
+        </div>
+
+        <ul class="campus-footer-links">
+            <li><a href="#hero">About</a></li>
+            <li><a href="#hero">Support Guidelines</a></li>
+            <li><a href="#hero">Counseling Center</a></li>
+            <li><a href="#hero">Privacy & Safety</a></li>
+        </ul>
+
+        <div class="campus-footer-right">
+            <div class="campus-footer-socials">
+                <span>📷</span>
+                <span>🐦</span>
+                <span>💼</span>
+                <span>📺</span>
+            </div>
+            <div>Made with ❤️ for our campus</div>
+        </div>
+    </div>
+</footer>
+
+<script th:src="@{/js/app.js}"></script>
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', () => {
+        const ctx = document.getElementById('moodChart');
+        if (!ctx) return;
+
+        const dates = [[${dates}]];
+        const moods = [[${moods}]];
+        const stressLevels = [[${stressLevels}]];
+
+        const moodLabels = ['', '😢 Awful', '😟 Low', '😐 Okay', '🙂 Good', '😄 Great'];
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: [
+                    {
+                        label: 'Mood Level',
+                        data: moods,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#2563eb',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        yAxisID: 'yMood'
+                    },
+                    {
+                        label: 'Stress Level (AI)',
+                        data: stressLevels,
+                        borderColor: '#f43f5e',
+                        backgroundColor: 'rgba(244, 63, 94, 0.06)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#f43f5e',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        yAxisID: 'yStress'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#334155',
+                            font: { family: 'Plus Jakarta Sans', size: 12, weight: '600' },
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#0f172a',
+                        titleColor: '#ffffff',
+                        bodyColor: '#cbd5e1',
+                        borderWidth: 0,
+                        cornerRadius: 8,
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                if (context.dataset.label === 'Mood Level') {
+                                    return 'Mood: ' + (moodLabels[context.raw] || context.raw);
+                                }
+                                return 'Stress: ' + context.raw + ' / 10';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: '#f1f5f9' },
+                        ticks: { color: '#64748b', font: { family: 'Plus Jakarta Sans', size: 11, weight: '500' } }
+                    },
+                    yMood: {
+                        type: 'linear', position: 'left', min: 1, max: 5,
+                        grid: { color: '#f1f5f9' },
+                        ticks: {
+                            color: '#2563eb', stepSize: 1,
+                            callback: function(v) { return moodLabels[v] || v; }
+                        },
+                        title: { display: true, text: 'Mood', color: '#2563eb', font: { family: 'Plus Jakarta Sans', weight: '700' } }
+                    },
+                    yStress: {
+                        type: 'linear', position: 'right', min: 1, max: 10,
+                        grid: { display: false },
+                        ticks: { color: '#f43f5e', stepSize: 2 },
+                        title: { display: true, text: 'Stress Level', color: '#f43f5e', font: { family: 'Plus Jakarta Sans', weight: '700' } }
+                    }
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

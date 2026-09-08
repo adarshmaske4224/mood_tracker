@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In — Campus MindTrack</title>
+    <meta name="description" content="Campus mental health mood and stress tracker. Login to track your daily wellbeing.">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-logo">🎓</div>
+            <h1>Campus MindTrack</h1>
+            <p>Daily Mental Wellness & Stress Support</p>
+        </div>
+
+        <!-- Alert Messages -->
+        <div th:if="${param.error}" class="alert alert-error">
+            ⚠️ Invalid username or password
+        </div>
+        <div th:if="${param.logout}" class="alert alert-info">
+            👋 You've been logged out successfully
+        </div>
+        <div th:if="${success}" class="alert alert-success">
+            ✅ <span th:text="${success}"></span>
+        </div>
+
+        <form th:action="@{/login}" method="post">
+            <div class="form-group">
+                <label class="form-label" for="username">Username</label>
+                <input type="text" id="username" name="username" class="form-input"
+                       placeholder="Enter your username (e.g. adarsh)" required autofocus>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-input"
+                       placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top: 0.5rem;">
+                🔐 Sign In to Campus
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>New student? <a th:href="@{/register}">Register your account</a></p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
